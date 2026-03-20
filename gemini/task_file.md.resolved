@@ -1,0 +1,608 @@
+# 📋 GIGASHIELD — Master Task File
+
+> `[ ]` Not started | `[/]` In progress | `[x]` Completed
+> **P0** Critical | **P1** Important | **P2** Nice-to-have
+> Each task has: Priority, ID, Description, Owner, Dependencies, Acceptance Criteria, Est. Hours
+
+---
+
+## PHASE 1 — DISCOVERY & RESEARCH (Days 1–3)
+
+### 1A. Market & Persona Research
+
+- [ ] **P0** `1A.1` — **Compile gig worker income data across 5 target cities**
+  - Owner: Research Lead
+  - Depends: None
+  - Sources: NITI Aayog gig economy report, ILO India, NSSO periodic surveys, Fairwork India 2025
+  - Acceptance:
+    - [ ] City-wise average daily earnings (Mumbai, Delhi, Bangalore, Hyderabad, Chennai)
+    - [ ] Earnings variance and seasonal fluctuation data
+    - [ ] Platform-specific breakdown (Zepto, Blinkit, Swiggy Instamart)
+    - [ ] Vulnerability index: % workers earning < ₹15,000/month
+  - Est: 4h
+
+- [ ] **P0** `1A.2` — **Map weather disruption frequency using IMD historical data**
+  - Owner: Data Eng
+  - Depends: None
+  - Sources: IMD open data, OpenWeatherMap historical API, India WRIS
+  - Acceptance:
+    - [ ] 3-year monthly disruption event count per city (rain >50mm, heat >42°C, AQI >400, flood alerts)
+    - [ ] Disruption heatmap visualization (city × month × event-type)
+    - [ ] Monsoon vs non-monsoon disruption ratio
+    - [ ] Average disruption duration per event type
+  - Est: 6h
+
+- [ ] **P0** `1A.3` — **Benchmark existing parametric insurance solutions**
+  - Owner: Research Lead
+  - Depends: None
+  - Targets: Plutas.ai, SEWA heatwave program, MIC Global + WRMS flood cover, J-PAL Delhi NCR pilot
+  - Acceptance:
+    - [ ] Feature comparison matrix (triggers, payouts, pricing, onboarding, fraud detection)
+    - [ ] Gap analysis: what none of them does that we will
+    - [ ] Pricing benchmarks (premium ranges, coverage amounts, loss ratios)
+  - Est: 3h
+
+### 1B. Technical Feasibility
+
+- [ ] **P0** `1B.1` — **Shield-SAC algorithm feasibility assessment**
+  - Owner: ML Eng
+  - Depends: None
+  - Acceptance:
+    - [ ] Reproduce basic SAC agent from PyTorch examples on simple env
+    - [ ] Implement shield mechanism (action clipping) on toy pricing problem
+    - [ ] Synthetic data generator: 1000 worker-weeks with weather features
+    - [ ] Go/No-Go decision documented with rationale
+    - [ ] If No-Go: XGBoost + fairness post-processing fallback spec written
+  - Est: 8h
+
+- [ ] **P0** `1B.2` — **Apply for Guidewire Cloud Platform sandbox access**
+  - Owner: Backend Lead
+  - Depends: None
+  - Acceptance:
+    - [ ] Application submitted to Guidewire partner portal
+    - [ ] Sandbox access confirmed OR fallback plan documented (simulate GWCP APIs)
+    - [ ] If access granted: PolicyCenter and ClaimCenter accessible
+  - Est: 2h
+
+- [ ] **P1** `1B.3` — **Evaluate WhatsApp Business API for onboarding bot**
+  - Owner: Frontend Lead
+  - Depends: None
+  - Acceptance:
+    - [ ] Meta Business API vs Twilio comparison (cost, template approval time, regional language support)
+    - [ ] Message template requirements documented (WhatsApp has 24-hour response window rules)
+    - [ ] Proof-of-concept: send/receive WhatsApp message via chosen API
+  - Est: 3h
+
+- [ ] **P1** `1B.4` — **Evaluate external APIs (weather, traffic, payments)**
+  - Owner: Backend Eng
+  - Depends: None
+  - Acceptance:
+    - [ ] OpenWeatherMap free tier: verify rate limits (60 calls/min), response latency, Indian city accuracy
+    - [ ] Razorpay Instant Payout sandbox: verify UPI payout flow, test with ₹1 transaction
+    - [ ] Google Maps Traffic API (or mock alternative): delay index availability for Indian cities
+  - Est: 4h
+
+### 1C. Parametric Model Definition
+
+- [ ] **P0** `1C.1` — **Define 5 parametric trigger thresholds with statistical justification**
+  - Owner: ML Eng + Research Lead
+  - Depends: `1A.2`
+  - Acceptance:
+    - [ ] Each trigger has: type, threshold, data source, payout range, historical frequency
+    - [ ] Thresholds calibrated against IMD data (not arbitrary numbers)
+    - [ ] Expected trigger frequency per city per month documented
+    - [ ] Actuarial loss ratio estimate per trigger type
+  - Details:
+    ```
+    HEAVY_RAIN:  >50 mm/hr   | Source: OWM  | Payout: ₹200-400  | Freq: ~4/month (Mumbai monsoon)
+    FLOOD:       zone active  | Source: CWC  | Payout: ₹400-800  | Freq: ~2/month (monsoon)
+    HEATWAVE:    >42°C        | Source: IMD  | Payout: ₹200      | Freq: ~6/month (May-June Delhi)
+    POLLUTION:   AQI >400     | Source: CPCB | Payout: ₹150      | Freq: ~8/month (Nov-Jan Delhi)
+    CURFEW:      alert active | Source: ACLED| Payout: ₹300      | Freq: ~0.5/month
+    ```
+  - Est: 5h
+
+- [ ] **P0** `1C.2` — **Design Disruption Severity Index (DSI) formula**
+  - Owner: ML Eng
+  - Depends: `1A.2`, `1C.1`
+  - Acceptance:
+    - [ ] Formula documented: DSI = 0.4×S_weather + 0.3×S_traffic + 0.3×S_orders
+    - [ ] Each sub-score normalized to 0-100 with clear calculation steps
+    - [ ] DSI thresholds defined (30/50/65/80/90) with action at each level
+    - [ ] Validated against 10+ historical disruption events (back-tested)
+  - Est: 4h
+
+---
+
+## PHASE 2 — ARCHITECTURE & DESIGN (Days 4–7)
+
+### 2A. System Architecture
+
+- [ ] **P0** `2A.1` — **Finalize 3-layer architecture diagram**
+  - Owner: Architect
+  - Depends: Phase 1 complete
+  - Acceptance:
+    - [ ] Mermaid diagram with all services, databases, message queues
+    - [ ] All data flows documented (arrows labeled with data types)
+    - [ ] Error flows documented (what happens when each service fails)
+    - [ ] Latency budget allocated per hop (total < 3 min trigger-to-payout)
+    - [ ] Exported as PNG/SVG for pitch deck
+  - Est: 4h
+
+- [ ] **P0** `2A.2` — **Design Guidewire product model (APD)**
+  - Owner: Backend Lead
+  - Depends: `1B.2`, `2A.1`
+  - Acceptance:
+    - [ ] Product definition: "GigShield Weekly Parametric"
+    - [ ] Coverage types mapped (Weather, Environmental, Civic)
+    - [ ] Policy lifecycle: PENDING → ACTIVE → EXPIRED/CANCELLED
+    - [ ] Rating integration point: Shield-SAC API call during quote
+    - [ ] If no GWCP: Simulated API following Guidewire REST contract shape
+  - Est: 6h
+
+- [ ] **P0** `2A.3` — **Design ClaimCenter zero-touch workflow**
+  - Owner: Backend Lead
+  - Depends: `2A.2`
+  - Acceptance:
+    - [ ] FNOL auto-creation from App Event
+    - [ ] PADS integration point in adjudication flow
+    - [ ] Decision tree: fraud_score → AUTO_APPROVE / FLAG / REJECT thresholds
+    - [ ] Payout trigger on APPROVED status
+    - [ ] Sequence diagram covering trigger → claim → payout
+  - Est: 4h
+
+### 2B. API & Data Design
+
+- [ ] **P0** `2B.1` — **Design complete PostgreSQL schema**
+  - Owner: Backend Eng
+  - Depends: `2A.1`
+  - Acceptance:
+    - [ ] All 7 tables defined (workers, zones, policies, triggers, claims, payouts, fraud_logs, shield_pools)
+    - [ ] All ENUMs defined
+    - [ ] Foreign keys and constraints specified
+    - [ ] Indexes for all query-heavy columns
+    - [ ] Seed data script: 500 workers, 25 zones (5 per city), 100 historical triggers
+  - Est: 4h
+
+- [ ] **P0** `2B.2` — **Write OpenAPI specifications for all 4 services**
+  - Owner: All Backend + ML
+  - Depends: `2A.1`
+  - Acceptance:
+    - [ ] Worker Service: 11 endpoints with request/response schemas
+    - [ ] Shield-SAC Service: 5 endpoints with pricing request/response
+    - [ ] PADS Service: 4 endpoints with fraud validation schemas
+    - [ ] Trigger Engine: 5 endpoints with trigger/DSI schemas
+    - [ ] All endpoints include error response schemas (400, 401, 404, 500)
+  - Est: 5h
+
+### 2C. UI/UX Design
+
+- [ ] **P0** `2C.1` — **Design 6 PWA screens (wireframes/mockups)**
+  - Owner: UI/UX
+  - Depends: `2A.1`
+  - Acceptance:
+    - [ ] Onboarding flow (7 steps, < 60 sec target)
+    - [ ] Home / Shield Status screen
+    - [ ] Storm Mode screen (auto-activates on trigger)
+    - [ ] Payout confirmation screen
+    - [ ] Claims / payout history screen
+    - [ ] Shield Pool screen (join/create pool, member list)
+    - [ ] Design system defined: colors, typography, component library
+  - Est: 6h
+
+- [ ] **P0** `2C.2` — **Design admin dashboard layout**
+  - Owner: UI/UX
+  - Depends: `2C.1`
+  - Acceptance:
+    - [ ] KPI cards: active policies, claims today, loss ratio, fraud rate
+    - [ ] DSI heatmap (Leaflet map with zone-level color coding)
+    - [ ] XAI panel (SHAP waterfall chart)
+    - [ ] Fraud monitor (live feed of flagged claims)
+    - [ ] Demo control panel (trigger injection buttons)
+  - Est: 4h
+
+- [ ] **P1** `2C.3` — **Design WhatsApp onboarding conversation flow**
+  - Owner: Frontend Lead
+  - Depends: `1B.3`
+  - Acceptance:
+    - [ ] Hindi, Marathi, Tamil, Telugu conversation trees
+    - [ ] Each flow: greeting → language → platform → earnings → zone → premium → subscribe
+    - [ ] Error handling (invalid inputs, timeout, retry)
+    - [ ] WhatsApp message template texts drafted
+  - Est: 3h
+
+### 2D. Infrastructure
+
+- [ ] **P0** `2D.1` — **Set up project repository and CI/CD pipeline**
+  - Owner: DevOps
+  - Depends: None
+  - Acceptance:
+    - [ ] Monorepo structure: `/frontend`, `/backend`, `/ml-services`, `/infra`, `/docs`
+    - [ ] GitHub Actions: build → lint → test → deploy (on push to main)
+    - [ ] Docker Compose for local dev (all services + PostgreSQL + Redis)
+    - [ ] Environment config: `.env.development`, `.env.production`
+    - [ ] README with setup instructions (< 5 min to local dev)
+  - Est: 4h
+
+---
+
+## PHASE 3 — MVP BUILD (Days 8–20)
+
+### Sprint 3A: Core Infrastructure (Days 8–13)
+
+- [ ] **P0** `3A.1` — **Set up PostgreSQL with schema + seed data**
+  - Owner: Backend Eng | Depends: `2B.1` | Est: 3h
+  - Acceptance:
+    - [ ] All tables created via migration files (not raw SQL)
+    - [ ] Seed script: 500 workers, 25 zones, 100 historical triggers, 50 past policies
+    - [ ] Database runs in Docker container
+    - [ ] Connection pooling configured (pg-pool)
+
+- [ ] **P0** `3A.2` — **Implement worker registration API**
+  - Owner: Backend Eng | Depends: `3A.1`, `2B.2` | Est: 4h
+  - Acceptance:
+    - [ ] POST /workers/register creates worker + auto-assigns zone (nearest by lat/lng)
+    - [ ] Phone uniqueness enforced
+    - [ ] OTP simulation (always accepts 123456 for demo)
+    - [ ] Response includes recommended plan from Shield-SAC
+    - [ ] Input validation (Joi/Zod schema)
+    - [ ] Unit tests: valid registration, duplicate phone, invalid input
+
+- [ ] **P0** `3A.3` — **Implement policy subscription API**
+  - Owner: Backend Lead | Depends: `3A.2` | Est: 4h
+  - Acceptance:
+    - [ ] POST /policies/subscribe creates 7-day policy
+    - [ ] Calls Shield-SAC for dynamic premium (or uses cached price)
+    - [ ] Policy status lifecycle: PENDING → ACTIVE (on payment) → EXPIRED (after 7 days)
+    - [ ] Pool discount applied if worker is in Shield Pool
+    - [ ] Cannot subscribe if active policy exists
+    - [ ] SHAP explanation stored in policy record
+
+- [ ] **P0** `3A.4` — **Implement Shield-SAC pricing microservice**
+  - Owner: ML Eng | Depends: `1B.1`, `2B.2` | Est: 10h
+  - Acceptance:
+    - [ ] FastAPI service with POST /calculate endpoint
+    - [ ] Trained on synthetic data (50,000 worker-weeks) — training completes < 4h
+    - [ ] OR fallback: XGBoost model trained (< 10 min) with fairness post-processing
+    - [ ] Shield mechanism: premium hard-capped at 5% of weekly earnings
+    - [ ] SHAP values returned with every premium
+    - [ ] Inference latency < 200ms (measured via /health endpoint)
+    - [ ] Unit tests: fairness constraint never violated across 1000 random inputs
+
+- [ ] **P0** `3A.5` — **Implement DSI calculation service**
+  - Owner: ML Eng | Depends: `1C.2` | Est: 4h
+  - Acceptance:
+    - [ ] FastAPI service with GET /dsi/:zone_id endpoint
+    - [ ] Computes DSI from weather (OWM), traffic (mock), orders (mock)
+    - [ ] Returns score 0-100 + breakdown of 3 sub-scores
+    - [ ] Caches result in Redis (TTL 5 min)
+    - [ ] GET /dsi/heatmap returns all zones with current DSI
+
+- [ ] **P0** `3A.6` — **Implement parametric trigger engine**
+  - Owner: Backend Eng | Depends: `1C.1`, `3A.1` | Est: 6h
+  - Acceptance:
+    - [ ] Polls weather API every 5 minutes per zone
+    - [ ] Evaluates 5 individual trigger thresholds + DSI composite
+    - [ ] On trigger: creates record in `triggers` table + emits event to message queue
+    - [ ] Deduplication: same trigger type for same zone within 6 hours = 1 trigger
+    - [ ] POST /triggers/inject for demo (creates trigger immediately)
+    - [ ] Logging: every poll logged with raw data
+
+- [ ] **P0** `3A.7` — **Build React PWA shell and design system**
+  - Owner: Frontend Lead | Depends: `2C.1`, `2D.1` | Est: 6h
+  - Acceptance:
+    - [ ] React 18 + Tailwind CSS 3 project initialized
+    - [ ] Router: React Router v6 with 6 routes (onboarding, home, storm, payout, history, pool)
+    - [ ] Design system: color palette (shield blue/green/orange/red), typography, spacing
+    - [ ] Component library: Button, Card, Badge, Modal, ProgressBar, StatusIndicator
+    - [ ] Mobile-responsive layout (PWA manifest configured)
+    - [ ] Service worker for offline capability
+
+- [ ] **P0** `3A.8` — **Integrate weather API pipeline**
+  - Owner: Backend Eng | Depends: `3A.6` | Est: 3h
+  - Acceptance:
+    - [ ] OpenWeatherMap current weather + forecast for 25 zones
+    - [ ] Rate limiting: ≤ 60 calls/min (batch zones with nearby coords)
+    - [ ] Response normalized to internal format (mm, °C, AQI)
+    - [ ] Mock mode: returns simulated data for demo (controllable via env var)
+
+### Sprint 3B: Intelligence & Automation (Days 14–20)
+
+- [ ] **P0** `3B.1` — **Implement zero-touch claim automation**
+  - Owner: Backend Lead | Depends: `3A.6`, `2A.3` | Est: 6h
+  - Acceptance:
+    - [ ] Trigger event → find all active policies in affected zone
+    - [ ] For each policy: create claim record (status: INITIATED)
+    - [ ] Call PADS fraud validation (parallel)
+    - [ ] If fraud_score < 0.3: AUTO_APPROVE → initiate payout
+    - [ ] If fraud_score ≥ 0.7: AUTO_REJECT → log reason
+    - [ ] If between: FLAG → log for manual review
+    - [ ] Duplicate prevention: UNIQUE (policy_id, trigger_id) constraint
+    - [ ] End-to-end target: trigger → payout initiation < 60 sec
+
+- [ ] **P0** `3B.2` — **Implement PADS fraud detection service**
+  - Owner: ML Eng | Depends: `2B.2` | Est: 8h
+  - Acceptance:
+    - [ ] FastAPI service with POST /validate endpoint
+    - [ ] 5-layer pipeline implemented:
+      - [ ] Layer 1: Device check (emulator/root detection) — binary
+      - [ ] Layer 2: GPS-IP consistency (Haversine + IP geolocation) — distance-decayed
+      - [ ] Layer 3: IMU kinematic validation (accelerometer + gyroscope) — ensemble
+      - [ ] Layer 4: Duplicate claim check (DB query) — deterministic
+      - [ ] Layer 5: Behavioral anomaly (Isolation Forest) — trained on seed data
+    - [ ] Weighted aggregation: final fraud_score 0.0-1.0
+    - [ ] All 5 check results logged to fraud_logs table
+    - [ ] Unit tests: clean claim passes, GPS spoof fails, emulator fails
+
+- [ ] **P0** `3B.3` — **Implement Razorpay instant payout**
+  - Owner: Backend Eng | Depends: `3B.1` | Est: 4h
+  - Acceptance:
+    - [ ] Razorpay Payout sandbox integration (not production)
+    - [ ] Payout to UPI ID (vpa)
+    - [ ] Webhook handler: payout.processed → update payouts table → update claim status to PAID
+    - [ ] Error handling: payout.failed → retry once → flag for manual
+    - [ ] Razorpay ref stored in payouts table
+    - [ ] End-to-end: claim approved → UPI credit < 3 min
+
+- [ ] **P0** `3B.4` — **Implement XAI dashboard component**
+  - Owner: ML Eng + Frontend Eng | Depends: `3A.4`, `3A.7` | Est: 5h
+  - Acceptance:
+    - [ ] SHAP waterfall chart component (Recharts or custom SVG)
+    - [ ] Shows top 5 factors for selected worker's premium
+    - [ ] Positive factors (increase premium) in red/orange
+    - [ ] Negative factors (decrease premium) in green
+    - [ ] Fairness constraint visualization (max allowed vs actual)
+
+- [ ] **P1** `3B.5` — **Implement WhatsApp onboarding bot**
+  - Owner: Frontend Lead | Depends: `1B.3`, `3A.2` | Est: 6h
+  - Acceptance:
+    - [ ] Webhook receives WhatsApp messages
+    - [ ] Conversation state machine: language → name → platform → earnings → subscribe
+    - [ ] Hindi and English conversation flows working
+    - [ ] Calls /workers/register API on completion
+    - [ ] Sends premium recommendation back via WhatsApp
+    - [ ] Error handling: invalid inputs prompt retry
+
+- [ ] **P0** `3B.6` — **Implement worker home screen**
+  - Owner: Frontend Eng | Depends: `3A.7`, `3A.4`, `3A.5` | Est: 5h
+  - Acceptance:
+    - [ ] Shield status badge (ACTIVE / EXPIRED / NONE)
+    - [ ] Current premium and coverage amounts
+    - [ ] 7-day risk forecast (DSI scores, color-coded)
+    - [ ] Zone name and risk level
+    - [ ] Shield Pool info (if joined)
+    - [ ] Quick actions: view claims, view payouts, view ROI
+    - [ ] Data refreshes on screen focus
+
+- [ ] **P0** `3B.7` — **Implement Storm Mode screen**
+  - Owner: Frontend Eng | Depends: `3B.1`, `3A.7` | Est: 4h
+  - Acceptance:
+    - [ ] Auto-activates via WebSocket/polling when trigger fires for worker's zone
+    - [ ] Shows: trigger type, DSI score, progress bar (4 steps)
+    - [ ] Steps: Trigger detected ✓ → Claim created ✓ → Fraud check ✓ → Payout processing...
+    - [ ] Expected payout amount and ETA
+    - [ ] Hindi motivational message at bottom
+    - [ ] Transitions to payout confirmation screen on completion
+
+- [ ] **P0** `3B.8` — **Implement payout confirmation screen**
+  - Owner: Frontend Eng | Depends: `3B.3`, `3A.7` | Est: 2h
+  - Acceptance:
+    - [ ] Amount credited in large font
+    - [ ] Razorpay reference number
+    - [ ] Trigger reason (e.g., "Heavy Rain — Andheri West")
+    - [ ] Time elapsed (trigger → payout)
+    - [ ] Share button (WhatsApp share)
+
+- [ ] **P1** `3B.9` — **Implement Shield Pool feature**
+  - Owner: Backend Eng + ML Eng | Depends: `2C.1`, `3A.3` | Est: 5h
+  - Acceptance:
+    - [ ] POST /pools/join — create pool in zone or join existing
+    - [ ] Premium recalculated with pool discount (15-20%)
+    - [ ] Pool page shows: members, total fund, discount %
+    - [ ] When trigger fires: all pool members get claims created
+    - [ ] Minimum 3 members to form pool
+
+- [ ] **P0** `3B.10` — **Implement demo control panel**
+  - Owner: Frontend Lead | Depends: `3A.6` | Est: 3h
+  - Acceptance:
+    - [ ] Admin-only page (no auth, just hidden URL for demo)
+    - [ ] Button per trigger type: Rain, Flood, Heat, Pollution, Curfew
+    - [ ] Zone selector dropdown
+    - [ ] Severity slider (for graduated DSI testing)
+    - [ ] "Inject" button calls POST /triggers/inject
+    - [ ] Success confirmation with trigger ID
+
+---
+
+## PHASE 4 — POLISH, TESTING & DOCUMENTATION (Days 21–28)
+
+### 4A. Testing
+
+- [ ] **P0** `4A.1` — **End-to-end integration test: happy path**
+  - Owner: All Team | Depends: Phase 3 | Est: 3h
+  - Acceptance:
+    - [ ] Onboard worker → subscribe → inject trigger → claim auto-created → fraud passes → payout sent
+    - [ ] Each step verified: correct data in DB, correct API responses, correct UI state
+    - [ ] Total time measured (target < 3 min)
+
+- [ ] **P0** `4A.2` — **Edge case testing**
+  - Owner: QA / All | Depends: `4A.1` | Est: 4h
+  - Acceptance:
+    - [ ] Duplicate trigger: worker gets only 1 claim per trigger
+    - [ ] Expired policy: no claim created
+    - [ ] Spoofed GPS: PADS rejects claim
+    - [ ] Emulator detection: PADS rejects claim
+    - [ ] Multiple triggers same zone: worker gets highest payout only
+    - [ ] Pool payout: all members receive claims correctly
+    - [ ] Premium > 5% earnings: shield caps correctly
+
+- [ ] **P1** `4A.3` — **Load test: 100 concurrent workers**
+  - Owner: DevOps + Backend | Depends: `4A.1` | Est: 3h
+  - Acceptance:
+    - [ ] k6 or Artillery script simulating 100 workers
+    - [ ] 50 simultaneous triggers fire
+    - [ ] All claims processed within 5 min
+    - [ ] No 5xx errors
+    - [ ] Response times documented
+
+### 4B. UI Polish
+
+- [ ] **P0** `4B.1` — **Complete UI polish pass**
+  - Owner: Frontend Team | Depends: Phase 3 | Est: 6h
+  - Acceptance:
+    - [ ] Loading skeletons on all data-fetching screens
+    - [ ] Error states with retry buttons
+    - [ ] Smooth transitions between screens (Framer Motion or CSS)
+    - [ ] Storm Mode animation (pulsing red/orange gradient)
+    - [ ] Payout celebration animation (confetti or checkmark)
+    - [ ] Responsive: works on 360px-768px width
+    - [ ] Zero console errors
+
+- [ ] **P0** `4B.2` — **Implement admin analytics dashboard**
+  - Owner: Frontend Lead | Depends: `2C.2` | Est: 5h
+  - Acceptance:
+    - [ ] 4 KPI cards (active policies, claims today, loss ratio, fraud rate)
+    - [ ] DSI heatmap (Leaflet map with colored zone markers)
+    - [ ] XAI panel (SHAP chart for selected worker)
+    - [ ] Fraud monitor (scrollable list of flagged claims)
+    - [ ] Demo control panel integrated
+    - [ ] Auto-refresh every 30 sec
+
+### 4C. Documentation & Pitch
+
+- [ ] **P0** `4C.1` — **Create 10-slide pitch deck**
+  - Owner: All Team | Depends: Working demo | Est: 6h
+  - Slides:
+    - [ ] 1. Title + team name + tagline
+    - [ ] 2. Problem (data-driven: 12M workers, ₹15K avg income, 20-30% loss)
+    - [ ] 3. Rahul's story (persona + emotional hook)
+    - [ ] 4. Solution overview (3-layer architecture diagram)
+    - [ ] 5. Guidewire integration (APD + PolicyCenter + ClaimCenter)
+    - [ ] 6. AI deep dive (Shield-SAC + PADS + DSI)
+    - [ ] 7. Demo screenshots (Storm Mode, XAI, WhatsApp)
+    - [ ] 8. Impact & scale (100K workers by 2026, Bima Sugam integration)
+    - [ ] 9. Business model (unit economics, loss ratio, break-even)
+    - [ ] 10. CTA ("Some storms you weather. Some you shield against.")
+
+- [ ] **P0** `4C.2` — **Record 5-minute demo video**
+  - Owner: All Team | Depends: `4B.1` | Est: 4h
+  - Acceptance:
+    - [ ] Follows demo script from implementation plan (Section 11)
+    - [ ] Professional narration (clear, confident, paced)
+    - [ ] Screen recording: 1080p minimum
+    - [ ] Phone screen mirroring for WhatsApp demo
+    - [ ] Backup segments for each critical flow
+
+- [ ] **P0** `4C.3` — **Write business model document**
+  - Owner: Research Lead | Depends: `3A.4` premium data | Est: 3h
+  - Acceptance:
+    - [ ] Revenue: avg premium × projected users × 52 weeks
+    - [ ] Cost: claims + tech infra + payment fees + support
+    - [ ] Loss ratio target: 60-70%
+    - [ ] Break-even analysis: minimum users needed
+    - [ ] CAC estimate (WhatsApp virality, platform partnerships)
+    - [ ] LTV:CAC ratio projection
+
+- [ ] **P1** `4C.4` — **Architecture documentation with Mermaid diagrams**
+  - Owner: Architect | Depends: `2A.1` | Est: 3h
+  - Acceptance:
+    - [ ] System architecture (all services + data stores)
+    - [ ] Data flow diagram (trigger → payout)
+    - [ ] Sequence diagram (onboarding, claim processing)
+    - [ ] Entity relationship diagram
+    - [ ] Deployment architecture diagram
+
+- [ ] **P1** `4C.5` — **Regulatory compliance document**
+  - Owner: Research Lead | Depends: `1B.4` | Est: 2h
+  - Acceptance:
+    - [ ] IRDAI Sandbox mapping (which regulations apply)
+    - [ ] Bima Sugam readiness checklist
+    - [ ] PMJJBY alignment analysis
+    - [ ] Data privacy (DPDP Act 2023) compliance notes
+
+---
+
+## PHASE 5 — DEMO & SUBMISSION (Days 29–32)
+
+- [ ] **P0** `5.1` — **Demo rehearsal #1 — Full run with timing**
+  - Owner: All Team | Est: 1.5h
+  - Acceptance: Complete demo within 5:00 ± 0:15, identify timing issues
+
+- [ ] **P0** `5.2` — **Demo rehearsal #2 — Q&A preparation**
+  - Owner: All Team | Est: 2h
+  - Acceptance: 20 potential judge questions answered, rotating responders assigned
+
+- [ ] **P0** `5.3` — **Demo rehearsal #3 — Failure mode practice**
+  - Owner: All Team | Est: 1.5h
+  - Acceptance: Recovery scripts for: trigger doesn't fire, payout fails, WhatsApp timeout
+
+- [ ] **P0** `5.4` — **Demo rehearsal #4 — External reviewer feedback**
+  - Owner: All Team | Est: 2h
+  - Acceptance: 1 external person watches, all feedback items addressed
+
+- [ ] **P0** `5.5` — **Demo rehearsal #5 — Final polished run**
+  - Owner: All Team | Est: 1h
+  - Acceptance: Smooth, confident, within time — recorded as backup
+
+- [ ] **P0** `5.6` — **Finalize and submit all artifacts**
+  - Owner: Lead | Est: 2h
+  - Acceptance:
+    - [ ] Code repository clean (no debug code, passwords, or TODOs)
+    - [ ] Pitch deck PDF finalized
+    - [ ] Demo video MP4 uploaded
+    - [ ] Architecture docs included
+    - [ ] README with setup instructions
+    - [ ] Submitted before deadline
+
+- [ ] **P0** `5.7` — **Deploy live demo instance**
+  - Owner: DevOps | Est: 2h
+  - Acceptance:
+    - [ ] All services running on cloud (Railway/Render/K8s)
+    - [ ] Public URL accessible
+    - [ ] Verified: full end-to-end flow works on deployed instance
+    - [ ] 99.9% uptime during judging period
+
+---
+
+## CRITICAL PATH (Shortest Path to Demo)
+
+```
+Day 1:  1B.1 (Shield-SAC Go/No-Go) + 1B.2 (GWCP access) + 1A.1 (income data)
+Day 2:  1A.2 (weather data) + 1C.1 (trigger thresholds) + 1B.3 (WhatsApp eval)
+Day 3:  1C.2 (DSI formula) + 1B.1 result → choose Shield-SAC or XGBoost
+Day 4:  2A.1 (architecture) + 2D.1 (CI/CD)
+Day 5:  2A.2 (APD model) + 2B.1 (DB schema) + 2B.2 (API specs)
+Day 6:  2A.3 (claims workflow) + 2C.1 (UI designs)
+Day 7:  2C.2 (admin dashboard) + 2C.3 (WhatsApp flow)
+Day 8:  3A.1 (DB setup) + 3A.7 (React PWA shell)
+Day 9:  3A.2 (registration API) + 3A.5 (DSI service)
+Day 10: 3A.3 (policy API) + 3A.4 begins (Shield-SAC training overnight)
+Day 11: 3A.4 (Shield-SAC inference API) + 3A.8 (weather integration)
+Day 12: 3A.6 (trigger engine) — *** END-TO-END BACKEND PATH READY ***
+Day 14: 3B.1 (claim automation) + 3B.2 (PADS fraud)
+Day 16: 3B.3 (Razorpay payout) — *** END-TO-END TRIGGER-TO-PAYOUT ***
+Day 17: 3B.4 (XAI) + 3B.6 (home screen)
+Day 18: 3B.5 (WhatsApp) + 3B.7 (Storm Mode) + 3B.8 (payout screen)
+Day 19: 3B.9 (Shield Pools) + 3B.10 (demo control)
+Day 20: *** FEATURE FREEZE *** — All P0 code complete
+Day 22: 4A.1 + 4A.2 (testing)
+Day 24: 4B.1 (UI polish) + 4B.2 (admin dashboard)
+Day 26: 4C.1 (pitch deck)
+Day 27: 4C.2 (demo video)
+Day 29: 5.1-5.3 (rehearsals)
+Day 31: 5.6-5.7 (submit + deploy)
+```
+
+---
+
+## STATS
+
+| Category | Count |
+|----------|-------|
+| **Total tasks** | 55 |
+| **P0 tasks** | 40 |
+| **P1 tasks** | 13 |
+| **P2 tasks** | 2 |
+| **Total estimated hours** | ~220h |
+| **Minimum team size** | 4 (ML + Backend + Frontend + Research) |
+| **Ideal team size** | 5-6 (+ DevOps + UI/UX) |
