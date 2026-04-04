@@ -11,6 +11,63 @@
 
 ---
 
+## Phase 0 Quick Start
+
+### Prerequisites
+
+- Docker Desktop (with Compose v2)
+
+### One-command local startup
+
+```bash
+docker compose --env-file .env.development up --build
+```
+
+This starts all Phase 0 services:
+
+- postgres on 5432
+- redis on 6379
+- backend on 3001
+- shield-sac on 8001
+- pads on 8002
+- dsi on 8003
+- frontend (Vite) on 5173
+
+### Health checks
+
+- http://localhost:3001/health
+- http://localhost:8001/health
+- http://localhost:8002/health
+- http://localhost:8003/health
+
+### Admin login (JWT)
+
+- Open `http://localhost:5173/admin/login`
+- Default credentials (from docker-compose defaults):
+  - username: `admin`
+  - password: `admin123`
+- On success, frontend stores a JWT token and uses it for:
+  - `/api/v1/admin/*` REST endpoints
+  - `/ws?role=admin&token=...` WebSocket channel
+
+### Database verification
+
+Open a shell in postgres container and run:
+
+```bash
+docker compose exec postgres psql -U gigashield -d gigashield -c "SELECT COUNT(*) AS zones FROM zones;"
+docker compose exec postgres psql -U gigashield -d gigashield -c "SELECT COUNT(*) AS workers FROM workers;"
+docker compose exec postgres psql -U gigashield -d gigashield -c "SELECT COUNT(*) AS triggers FROM triggers;"
+```
+
+Expected minimums after seed load:
+
+- zones: 25
+- workers: 50
+- triggers: 75
+
+---
+
 ## 💡 Inspiration
 
 Every day, **12 million** gig delivery workers in India — riders for *Zepto*, *Blinkit*, and *Swiggy Instamart* — face an invisible tax on their income: **weather**.
@@ -286,15 +343,14 @@ At 100,000 workers: ₹30L/week   →  ₹15.6Cr/year  (break-even at ~500 worke
 ```
 GIGASHIELD/
 ├── README.md                 ← You are here
+├── documentation.md          ← Full technical docs & API reference
 ├── frontend/                 ← React PWA
 ├── backend/                  ← Node.js Express API
 ├── ml-services/              ← Python microservices
 │   ├── shield-sac/           ← DRL pricing engine
 │   ├── pads/                 ← Fraud detection pipeline
 │   └── dsi/                  ← Disruption Severity Index
-├── infra/                    ← Docker, CI/CD configs
-├── docs/                     ← Architecture diagrams, pitch deck
-└── submission/               ← Phase deliverables
+└── infra/                    ← Docker, CI/CD configs
 ```
 
 ---
@@ -308,4 +364,4 @@ GIGASHIELD/
 
 ---
 
-**Built with ❤️ by Team Nuuvixx** | [Guidewire DevTrails Hackathon 2026](https://github.com/Ritinpaul/GuideWire)
+**Built with ❤️ by Team Recursive Minds** | [Guidewire DevTrails Hackathon 2026](https://github.com/Ritinpaul/GuideWire)
