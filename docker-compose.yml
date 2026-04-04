@@ -1,0 +1,156 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gigashield}
+      POSTGRES_USER: ${POSTGRES_USER:-gigashield}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gigashield123}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - ./backend/migrations/002_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-gigashield} -d ${POSTGRES_DB:-gigashield}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-gigashield}:${POSTGRES_PASSWORD:-gigashield123}@postgres:5432/${POSTGRES_DB:-gigashield}
+      REDIS_URL: redis://redis:6379
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-replace_me}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-replace_me}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-replace_me}
+      SHIELD_SAC_URL: http://shield-sac:8001
+      PADS_URL: http://pads:8002
+      DSI_URL: http://dsi:8003
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-change-this-jwt-secret}
+      ADMIN_JWT_EXPIRES_IN: ${ADMIN_JWT_EXPIRES_IN:-8h}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  shield-sac:
+    build:
+      context: ./ml-services/shield-sac
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-gigashield}:${POSTGRES_PASSWORD:-gigashield123}@postgres:5432/${POSTGRES_DB:-gigashield}
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '8001:8001'
+    volumes:
+      - ./ml-services/shield-sac:/app
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:8001/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  pads:
+    build:
+      context: ./ml-services/pads
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-gigashield}:${POSTGRES_PASSWORD:-gigashield123}@postgres:5432/${POSTGRES_DB:-gigashield}
+      REDIS_URL: redis://redis:6379
+      BACKEND_URL: http://backend:3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '8002:8002'
+    volumes:
+      - ./ml-services/pads:/app
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:8002/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  dsi:
+    build:
+      context: ./ml-services/dsi
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-gigashield}:${POSTGRES_PASSWORD:-gigashield123}@postgres:5432/${POSTGRES_DB:-gigashield}
+      REDIS_URL: redis://redis:6379
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-replace_me}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '8003:8003'
+    volumes:
+      - ./ml-services/dsi:/app
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:8003/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      VITE_PROXY_TARGET: http://backend:3001
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+  redis_data:

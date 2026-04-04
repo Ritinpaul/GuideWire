@@ -1,0 +1,45 @@
+# Environment
+.env
+.env.development
+.env.production
+.env.local
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+*.log
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.eggs/
+dist/
+*.pkl
+*.joblib
+
+# ML models
+ml-services/shield-sac/models/
+ml-services/pads/models/
+
+# Docker volumes (if mounted locally)
+.docker-volumes/
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sensitive
+*.pem
+*.key
+secrets/
