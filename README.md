@@ -23,6 +23,22 @@
 
 ---
 
+## 🎬 Demo Video
+
+<div align="center">
+
+<a href="https://drive.google.com/file/d/14ga3pqhmhaUCemufXEPR6od2vAh0Gc0f/view?usp=sharing">
+  <img src="https://drive.google.com/thumbnail?id=14ga3pqhmhaUCemufXEPR6od2vAh0Gc0f&sz=w328" alt="GIGASHIELD NEXUS — Demo Video" width="328" />
+  <br/>
+  <sub>▶️ Click to watch the full demo — Landing Page → Onboarding → Dashboard → Storm Mode → Payout</sub>
+</a>
+
+</div>
+
+> **What the demo covers:** Complete end-to-end user journey including the premium landing page, 73-second Telegram onboarding, AI-powered dashboard with live DSI forecast, real-time Storm Mode weather trigger, PADS fraud validation, and instant UPI payout — all in under 3 minutes.
+
+---
+
 ## 💡 The Problem
 
 Every day, **12 million** gig delivery workers in India face an invisible tax on their income: **weather**. A 30-minute rainstorm in Mumbai wipes out an entire shift's earnings (₹500–₹800). Across monsoon season, that compounds to **₹12,000+ in lost income** — devastating for someone earning less than ₹15,000/month.
