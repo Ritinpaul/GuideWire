@@ -11,6 +11,7 @@ import { z } from 'zod';
 import pool from '../db/pool.js';
 import { validateBody } from '../middleware/validate.js';
 import requireAdmin from '../middleware/requireAdmin.js';
+import { createRateLimiter } from '../middleware/rateLimit.js';
 import { validateClaim, getZoneDSI, getDSIHeatmap } from '../services/mlClient.js';
 import { broadcast } from '../ws/broadcast.js';
 
@@ -44,7 +45,14 @@ const InjectSchema = z.object({
   raw_data: z.record(z.unknown()).default({}),
 });
 
-router.post('/inject', requireAdmin, validateBody(InjectSchema), async (req, res, next) => {
+const triggerInjectRateLimit = createRateLimiter({
+  name: 'trigger_inject',
+  windowMs: 60_000,
+  max: 20,
+  keyFn: (req) => `${req.ip || 'unknown'}:${req.admin?.username || 'admin'}`,
+});
+
+router.post('/inject', requireAdmin, triggerInjectRateLimit, validateBody(InjectSchema), async (req, res, next) => {
   const { zone_id, type, severity_value, dsi_score, source, raw_data } = req.body;
   const dbClient = await pool.connect();
 
@@ -240,7 +248,7 @@ async function _initiatePayoutRecord(claim) {
       [claim.claim_id, claim.worker_id, claim.claim_amount, 'demo@upi'],
     );
 
-    setTimeout(async () => {
+    setTimeout(async () => {  // 8s simulates Razorpay processing time
       const ref = `pay_DEMO_${Date.now()}`;
       await pool.query(
         `UPDATE payouts SET status = 'COMPLETED', razorpay_ref = $2, completed_at = NOW()
@@ -260,7 +268,7 @@ async function _initiatePayoutRecord(claim) {
         trigger_type: claim.trigger_type ?? 'HEAVY_RAIN',
         zone_name: claim.zone_name ?? claim.zone_id ?? 'Your zone',
       });
-    }, 30_000);
+    }, 8_000);
   } catch (err) {
     console.error('[PAYOUT] Failed to create payout record:', err.message);
   }
@@ -284,6 +292,117 @@ router.get('/active', async (_req, res, next) => {
        LIMIT 50`,
     );
     res.json({ triggers: rows, total: rows.length });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── LIVE WEATHER SCAN — Demo-defining feature ──────────────────────────────
+// Fetches real/mock weather for all 25 zones via DSI heatmap,
+// identifies zones breaching trigger threshold, and auto-fires triggers.
+router.post('/live-scan', requireAdmin, async (req, res, next) => {
+  try {
+    const heatmapData = await getDSIHeatmap();
+    const zones = Array.isArray(heatmapData?.zones) ? heatmapData.zones : [];
+
+    if (zones.length === 0) {
+      return res.json({
+        success: true,
+        scanned: 0,
+        triggered: [],
+        message: 'DSI service unavailable — no zones scanned.',
+      });
+    }
+
+    const DSI_TRIGGER_THRESHOLD = 65;
+    const triggered = [];
+    const skipped = [];
+
+    for (const z of zones) {
+      const score = z.dsi_score ?? 0;
+      if (score < DSI_TRIGGER_THRESHOLD) {
+        skipped.push({ zone_id: z.zone_id, name: z.name, city: z.city, dsi_score: score, level: z.level });
+        continue;
+      }
+
+      // Determine trigger type from the zone's triggered events
+      const events = z.triggered_events ?? [];
+      const type = events[0] ?? 'COMPOSITE_DSI';
+
+      // Fire the trigger through the existing pipeline
+      try {
+        const dbClient = await pool.connect();
+        try {
+          await dbClient.query('BEGIN');
+          const { rows: [trigger] } = await dbClient.query(
+            `INSERT INTO triggers
+               (zone_id, type, severity_value, dsi_score, raw_data, source, detected_at)
+             VALUES ($1::uuid, $2, $3, $4, $5, $6, NOW())
+             RETURNING *`,
+            [z.zone_id, type, score / 10, score, JSON.stringify({
+              weather: z.weather ?? {},
+              breakdown: z.breakdown ?? {},
+              source: 'LIVE_WEATHER_SCAN',
+            }), 'LIVE_WEATHER'],
+          );
+
+          const { rows: policies } = await dbClient.query(
+            `SELECT p.id AS policy_id, p.worker_id, p.plan_tier, p.coverage_amount::float,
+                    w.name AS worker_name
+             FROM policies p JOIN workers w ON w.id = p.worker_id
+             WHERE w.zone_id = $1::uuid AND p.status = 'ACTIVE'
+               AND CURRENT_DATE BETWEEN p.start_date AND p.end_date`,
+            [z.zone_id],
+          );
+
+          const claimsCreated = [];
+          for (const pol of policies) {
+            const amount = computeClaimAmount(pol.plan_tier, pol.coverage_amount, score);
+            const { rows: [claim] } = await dbClient.query(
+              `INSERT INTO claims (policy_id, trigger_id, claim_amount, status, adjudication_type)
+               VALUES ($1::uuid, $2::uuid, $3, 'INITIATED', 'PENDING')
+               ON CONFLICT (policy_id, trigger_id) DO NOTHING RETURNING id`,
+              [pol.policy_id, trigger.id, amount],
+            );
+            if (claim) claimsCreated.push({ claim_id: claim.id, policy_id: pol.policy_id, worker_id: pol.worker_id, worker_name: pol.worker_name, plan_tier: pol.plan_tier, claim_amount: amount });
+          }
+
+          await dbClient.query('COMMIT');
+
+          // Fire PADS validation in background
+          _runPadsForClaims(claimsCreated, trigger, z.zone_id).catch(() => {});
+
+          broadcast('TRIGGER_FIRED', {
+            trigger_id: trigger.id, zone_id: z.zone_id, zone_name: z.name, city: z.city,
+            type, dsi_score: score, source: 'LIVE_WEATHER', claims_created: claimsCreated.length, claims: claimsCreated,
+          });
+
+          triggered.push({
+            zone_id: z.zone_id, name: z.name, city: z.city, dsi_score: score, level: z.level,
+            type, policies_affected: policies.length, claims_created: claimsCreated.length,
+            weather: z.weather ?? {},
+          });
+        } catch (innerErr) {
+          await dbClient.query('ROLLBACK');
+          console.error(`[LIVE-SCAN] Zone ${z.name} trigger failed:`, innerErr.message);
+        } finally {
+          dbClient.release();
+        }
+      } catch (connErr) {
+        console.error(`[LIVE-SCAN] DB connect failed for zone ${z.name}:`, connErr.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      scanned: zones.length,
+      threshold: DSI_TRIGGER_THRESHOLD,
+      triggered,
+      below_threshold: skipped.length,
+      message: triggered.length > 0
+        ? `🔴 ${triggered.length} zone(s) breached DSI ${DSI_TRIGGER_THRESHOLD}. Claims auto-created.`
+        : `All ${zones.length} zones below DSI ${DSI_TRIGGER_THRESHOLD}. No triggers fired.`,
+    });
   } catch (err) {
     next(err);
   }

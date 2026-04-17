@@ -15,6 +15,7 @@ import { initWebSocket } from './ws/broadcast.js';
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 import errorHandler from './middleware/errorHandler.js';
+import requestContext from './middleware/requestContext.js';
 
 // ── Routers ───────────────────────────────────────────────────────────────────
 import workersRouter   from './routes/workers.js';
@@ -30,16 +31,40 @@ import authRouter      from './routes/auth.js';
 // ─────────────────────────────────────────────────────────────────────────────
 const app  = express();
 const port = Number(process.env.PORT ?? 3001);
+const nodeEnv = process.env.NODE_ENV ?? 'development';
+
+const corsOriginList = (process.env.CORS_ORIGINS ?? '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const devDefaultOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+];
+
+const allowedOrigins = corsOriginList.length > 0 ? corsOriginList : (nodeEnv === 'production' ? [] : devDefaultOrigins);
+
+function isOriginAllowed(origin) {
+  if (!origin) return true;
+  return allowedOrigins.includes(origin);
+}
 
 // ── Global middleware ─────────────────────────────────────────────────────────
-app.use(cors({ origin: '*' }));
+app.set('trust proxy', 1);
+app.use(requestContext);
+app.use(cors({
+  origin(origin, callback) {
+    if (isOriginAllowed(origin)) return callback(null, true);
+    return callback(new Error('CORS origin not allowed'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-request-id'],
+  credentials: false,
+}));
 app.use(express.json({ limit: '1mb' }));
-
-// Request logger (dev-friendly, no external dep)
-app.use((req, _res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', async (_req, res) => {

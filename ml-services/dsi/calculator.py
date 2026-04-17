@@ -4,13 +4,16 @@ DSI Calculator — Disruption Severity Index.
 Formula:
     S_weather = 0.25*rain_sev + 0.20*temp_sev + 0.20*aqi_sev
               + 0.15*flood_sev + 0.10*wind_sev + 0.10*vis_sev
-    S_traffic = 50 (static mock for hackathon)
+    S_traffic = dynamic simulation (zone-aware, time-of-day, stochastic noise)
     S_orders  = 100 * (1 - current_orders / expected_orders)
     DSI       = 0.40*S_weather + 0.30*S_traffic + 0.30*S_orders
 """
 from __future__ import annotations
 from dataclasses import dataclass
+from datetime import datetime
+import hashlib
 import math
+import random
 
 
 @dataclass
@@ -105,6 +108,38 @@ def _compute_s_weather(w: WeatherInput, flood_risk_score: float) -> tuple[float,
     return _clamp(s_weather), factors
 
 
+def _compute_s_traffic(zone_id: str, rain_mm: float = 0.0) -> float:
+    """
+    Dynamic traffic congestion simulation.
+    Varies by zone (deterministic offset from zone ID hash), hour of day
+    (peak commute hours 8-10am and 5-8pm), rain amplification, and
+    stochastic Gaussian noise for realistic variance between calls.
+    """
+    hour = datetime.now().hour
+
+    # Peak commute hours produce higher congestion
+    if 8 <= hour <= 10 or 17 <= hour <= 20:
+        base = 72.0
+    elif 11 <= hour <= 16:
+        base = 48.0
+    elif 6 <= hour <= 7 or 21 <= hour <= 22:
+        base = 38.0
+    else:
+        base = 22.0  # late night / early morning
+
+    # Deterministic per-zone offset so each zone has consistent personality
+    zone_hash = int(hashlib.md5(zone_id.encode()).hexdigest()[:8], 16)
+    zone_offset = (zone_hash % 25) - 12  # range: -12 to +12
+
+    # Rain amplifies traffic congestion (waterlogged roads, slower movement)
+    rain_boost = min(20.0, rain_mm * 0.25) if rain_mm > 5 else 0.0
+
+    # Gaussian noise for natural variance
+    noise = random.gauss(0, 4.5)
+
+    return _clamp(base + zone_offset + rain_boost + noise)
+
+
 def _compute_s_orders(rain_mm: float, expected_orders: float = 15.0) -> float:
     """
     Simulated order drop effect: heavy rain → fewer deliveries → higher income loss.
@@ -119,8 +154,9 @@ def compute_dsi(weather: WeatherInput, zone: dict) -> DSIResult:
 
     flood_risk = zone.get("flood_risk_score", 0.5)
 
+    zone_id = zone.get("id", "default")
     s_weather, factors = _compute_s_weather(weather, flood_risk)
-    s_traffic = 50.0  # Static mock — real: integrate Google Maps / Mapbox
+    s_traffic = _compute_s_traffic(zone_id, weather.rain_mm)
     s_orders  = _compute_s_orders(weather.rain_mm)
 
     dsi_score = round(0.40 * s_weather + 0.30 * s_traffic + 0.30 * s_orders, 2)

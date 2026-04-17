@@ -11,6 +11,7 @@ import KPICards         from '../components/admin/KPICards.jsx'
 import DSIHeatmap       from '../components/admin/DSIHeatmap.jsx'
 import DemoControlPanel from '../components/admin/DemoControlPanel.jsx'
 import FraudMonitor     from '../components/admin/FraudMonitor.jsx'
+import PADSComparison   from '../components/admin/PADSComparison.jsx'
 import TriggerTimeline  from '../components/admin/TriggerTimeline.jsx'
 import XAIPanel         from '../components/admin/XAIPanel.jsx'
 import api              from '../services/api.js'
@@ -147,8 +148,8 @@ export default function AdminDashboard() {
       {/* ── Top bar ────────────────────────────────────────────────── */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 200,
-        background: 'rgba(17,29,4,0.94)', backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(200,230,74,0.08)',
+        background: 'rgba(17,17,17,0.94)', backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(184,255,0,0.08)',
         padding: '0 28px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -156,7 +157,7 @@ export default function AdminDashboard() {
             width: 34, height: 34, borderRadius: 10,
             background: 'linear-gradient(135deg, var(--lime), var(--lime-light))',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
-            boxShadow: '0 0 16px rgba(200,230,74,0.25)',
+            boxShadow: '0 0 16px rgba(184,255,0,0.25)',
           }}>🛡️</div>
           <div>
             <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '1rem', color: 'var(--lime)' }}>GIGASHIELD</span>
@@ -207,8 +208,8 @@ export default function AdminDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 20, height: 520 }}>
 
           {/* DSI Heatmap */}
-          <div style={{ background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', borderRadius: 24, overflow: 'hidden', height: '100%' }}>
-            <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(200,230,74,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ background: 'var(--bg-800)', border: '1.5px solid rgba(184,255,0,0.08)', borderRadius: 24, overflow: 'hidden', height: '100%' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(184,255,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>DSI Heatmap — 25 Zones Live</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 99, background: 'rgba(74,222,128,0.08)' }}>
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', animation: 'pulse 2s infinite' }} />
@@ -236,13 +237,13 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* ── Bottom grid: XAI + Fraud Monitor + Timeline ─────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 320px', gap: 20, minHeight: 460 }}>
+        {/* ── Innovation row: XAI + PADS Physics Demo ─────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, minHeight: 520 }}>
 
           {/* XAI Panel */}
           <div style={{
             borderRadius: 24, display: 'flex', flexDirection: 'column',
-            background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', padding: 20,
+            background: 'var(--bg-800)', border: '1.5px solid rgba(184,255,0,0.08)', padding: 20,
           }}>
             <div style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '0.9rem', color: 'var(--lime)', marginBottom: 16 }}>
               🧠 Shield-SAC XAI
@@ -252,10 +253,22 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* PADS Physics Comparison */}
+          <div style={{
+            borderRadius: 24, display: 'flex', flexDirection: 'column',
+            background: 'var(--bg-800)', border: '1.5px solid rgba(184,255,0,0.08)', padding: 20,
+          }}>
+            <PADSComparison />
+          </div>
+        </div>
+
+        {/* ── Operations row: Fraud Monitor + Timeline ─────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, minHeight: 380 }}>
+
           {/* Fraud Monitor */}
           <div style={{
             borderRadius: 24, display: 'flex', flexDirection: 'column',
-            background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', padding: 20,
+            background: 'var(--bg-800)', border: '1.5px solid rgba(184,255,0,0.08)', padding: 20,
           }}>
             <FraudMonitor liveEvents={liveEvents} />
           </div>
@@ -263,7 +276,7 @@ export default function AdminDashboard() {
           {/* Trigger Timeline */}
           <div style={{
             borderRadius: 24, display: 'flex', flexDirection: 'column',
-            background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', padding: 20,
+            background: 'var(--bg-800)', border: '1.5px solid rgba(184,255,0,0.08)', padding: 20,
           }}>
             <TriggerTimeline liveEvents={liveEvents} />
           </div>
@@ -271,7 +284,7 @@ export default function AdminDashboard() {
 
         {/* ── Live event log (collapsible) ──────────────────────── */}
         {liveEvents.length > 0 && (
-          <details style={{ background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', borderRadius: 20, padding: '14px 20px' }}>
+          <details style={{ background: 'var(--bg-800)', border: '1.5px solid rgba(184,255,0,0.08)', borderRadius: 20, padding: '14px 20px' }}>
             <summary style={{ cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               WebSocket Event Log ({liveEvents.length})
             </summary>

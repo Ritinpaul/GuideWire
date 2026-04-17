@@ -88,7 +88,7 @@ export default function PayoutConfirm() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(160deg, rgba(200,230,74,0.06) 0%, var(--bg-900) 40%)',
+      background: 'linear-gradient(160deg, rgba(184,255,0,0.06) 0%, var(--bg-900) 40%)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       padding: '40px 24px', position: 'relative', overflow: 'hidden',
     }}>
@@ -141,7 +141,7 @@ export default function PayoutConfirm() {
           [copy.source, 'Razorpay → UPI'],
           [copy.status, copy.completed],
         ].map(([k, v]) => (
-          <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid rgba(200,230,74,0.06)' }}>
+          <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid rgba(184,255,0,0.06)' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{k}</span>
             <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{v}</span>
           </div>

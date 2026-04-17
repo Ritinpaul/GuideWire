@@ -42,14 +42,14 @@ export default function AdminAccess() {
       <div style={{
         position: 'absolute', top: '-20%', left: '50%', transform: 'translateX(-50%)',
         width: 500, height: 500,
-        background: 'radial-gradient(circle, rgba(200,230,74,0.06), transparent 70%)',
+        background: 'radial-gradient(circle, rgba(184,255,0,0.06), transparent 70%)',
         pointerEvents: 'none',
       }} />
       <div className="noise-overlay" />
 
       <div style={{
         width: '100%', maxWidth: 460,
-        background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.1)',
+        background: 'var(--bg-800)', border: '1.5px solid rgba(184,255,0,0.1)',
         borderRadius: 28, padding: 36, position: 'relative', zIndex: 2,
         boxShadow: '0 24px 48px rgba(0,0,0,0.3)',
       }}>

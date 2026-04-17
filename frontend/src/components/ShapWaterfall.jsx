@@ -47,7 +47,7 @@ export default function ShapWaterfall({ explanation, premium }) {
 
       <div style={{
         marginTop: 12, paddingTop: 12,
-        borderTop: '1px solid rgba(200,230,74,0.08)',
+        borderTop: '1px solid rgba(184,255,0,0.08)',
         display: 'flex', justifyContent: 'space-between',
       }}>
         <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Your fair premium</span>

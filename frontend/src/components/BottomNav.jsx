@@ -34,32 +34,75 @@ export default function BottomNav() {
     }
   }
 
+  const baseStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 3,
+    padding: '8px 12px',
+    borderRadius: 14,
+    color: '#999',
+    transition: 'all 0.2s',
+    flex: 1,
+    textDecoration: 'none',
+    fontSize: '0.65rem',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+  }
+
+  const activeStyle = {
+    ...baseStyle,
+    color: '#1a1a1a',
+  }
+
   return (
-    <nav className="bottom-nav">
-      <NavLink to="/home" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <Home size={22} />
-        <span>{copy.shield}</span>
-      </NavLink>
+    <nav style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      width: '100%',
+      height: 70,
+      background: 'rgba(245, 245, 240, 0.92)',
+      borderTop: '1px solid rgba(0,0,0,0.06)',
+      backdropFilter: 'blur(24px)',
+      WebkitBackdropFilter: 'blur(24px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 0,
+      padding: '0 8px',
+      zIndex: 100,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', width: '100%', maxWidth: 600 }}>
+        <NavLink to="/home" style={({ isActive }) => isActive ? activeStyle : baseStyle}>
+          <Home size={22} />
+          <span>{copy.shield}</span>
+        </NavLink>
 
-      <NavLink to="/claims" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <FileText size={22} />
-        <span>{copy.claims}</span>
-      </NavLink>
+        <NavLink to="/claims" style={({ isActive }) => isActive ? activeStyle : baseStyle}>
+          <FileText size={22} />
+          <span>{copy.claims}</span>
+        </NavLink>
 
-      <NavLink to="/storm" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <CloudLightning size={22} />
-        <span>{copy.storm}</span>
-      </NavLink>
+        <NavLink to="/storm" style={({ isActive }) => isActive ? activeStyle : baseStyle}>
+          <CloudLightning size={22} />
+          <span>{copy.storm}</span>
+        </NavLink>
 
-      <NavLink to="/payout" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <Wallet size={22} />
-        <span>{copy.payout}</span>
-      </NavLink>
+        <NavLink to="/payout" style={({ isActive }) => isActive ? activeStyle : baseStyle}>
+          <Wallet size={22} />
+          <span>{copy.payout}</span>
+        </NavLink>
 
-      <button className="bottom-nav-item" onClick={logout} style={{ color: 'var(--text-muted)' }}>
-        <LogOut size={22} />
-        <span>{copy.exit}</span>
-      </button>
+        <button style={baseStyle} onClick={logout}>
+          <LogOut size={22} />
+          <span>{copy.exit}</span>
+        </button>
+      </div>
     </nav>
   )
 }

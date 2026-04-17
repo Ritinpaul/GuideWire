@@ -39,6 +39,11 @@ export default function DemoControlPanel({ zones, onTriggerFired }) {
   const [lastResult,      setLastResult]      = useState(null)
   const [error,           setError]           = useState('')
 
+  // Live Weather Scan state
+  const [scanLoading, setScanLoading] = useState(false)
+  const [scanResult,  setScanResult]  = useState(null)
+  const [scanError,   setScanError]   = useState('')
+
   useEffect(() => {
     if (!zoneOptions.length) return
     const isValidSelection = zoneOptions.some((z) => z.id === selectedZone)
@@ -46,6 +51,21 @@ export default function DemoControlPanel({ zones, onTriggerFired }) {
       setSelectedZone(zoneOptions[0].id)
     }
   }, [zoneOptions, selectedZone])
+
+  const runLiveScan = async () => {
+    setScanLoading(true); setScanError(''); setScanResult(null)
+    try {
+      const res = await api.post('/triggers/live-scan')
+      setScanResult(res.data)
+      if (res.data?.triggered?.length > 0) {
+        onTriggerFired?.({ claims_created: res.data.triggered.reduce((s, t) => s + (t.claims_created ?? 0), 0) })
+      }
+    } catch (err) {
+      setScanError(err?.response?.data?.message ?? err.message ?? 'Live scan failed')
+    } finally {
+      setScanLoading(false)
+    }
+  }
 
   const fire = async () => {
     if (!selectedZone) { setError('Select a zone first'); return }
@@ -73,6 +93,87 @@ export default function DemoControlPanel({ zones, onTriggerFired }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+      {/* ── LIVE WEATHER SCAN ────────────────────────────────── */}
+      <div style={{
+        padding: 16, borderRadius: 16,
+        background: 'linear-gradient(135deg, rgba(239,68,68,0.06), rgba(251,191,36,0.04))',
+        border: '1.5px solid rgba(239,68,68,0.2)',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#EF4444', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              🔴 Live Weather Scan
+            </div>
+            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 2 }}>
+              Scan all 25 zones with real weather data
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={runLiveScan} disabled={scanLoading}
+          style={{
+            width: '100%', padding: '14px', borderRadius: 12, fontSize: '0.95rem', fontWeight: 800,
+            background: scanLoading ? 'var(--bg-700)' : 'linear-gradient(135deg, #DC2626, #B91C1C)',
+            color: '#fff', border: 'none', cursor: scanLoading ? 'wait' : 'pointer',
+            boxShadow: scanLoading ? 'none' : '0 0 24px rgba(239,68,68,0.35)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            letterSpacing: '0.04em', transition: 'all 0.2s',
+          }}
+        >
+          {scanLoading
+            ? <><Loader size={18} className="animate-spin" /> Scanning 25 zones…</>
+            : <>🛰️ SCAN LIVE WEATHER → AUTO-TRIGGER</>
+          }
+        </button>
+
+        {scanError && (
+          <div style={{ marginTop: 10, padding: '8px 12px', borderRadius: 10, background: 'var(--danger-bg)', color: 'var(--danger)', fontSize: '0.78rem', display: 'flex', gap: 6, alignItems: 'center' }}>
+            <AlertTriangle size={13} /> {scanError}
+          </div>
+        )}
+
+        {scanResult && (
+          <div style={{ marginTop: 12, animation: 'fadeIn 0.3s ease' }}>
+            <div style={{
+              padding: '10px 14px', borderRadius: 10, fontSize: '0.8rem', fontWeight: 600,
+              background: scanResult.triggered?.length > 0 ? 'rgba(239,68,68,0.06)' : 'rgba(74,222,128,0.06)',
+              color: scanResult.triggered?.length > 0 ? '#FCA5A5' : 'var(--success)',
+              border: `1px solid ${scanResult.triggered?.length > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(74,222,128,0.15)'}`,
+            }}>
+              {scanResult.message}
+            </div>
+
+            {scanResult.triggered?.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+                {scanResult.triggered.map((t, i) => (
+                  <div key={i} style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '8px 12px', borderRadius: 10,
+                    background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.1)',
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{t.name}</div>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{t.city} · {t.type?.replace(/_/g, ' ')}</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontFamily: 'Space Grotesk', fontWeight: 800, fontSize: '1rem', color: '#EF4444' }}>DSI {t.dsi_score}</div>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--success)' }}>{t.claims_created} claims</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ── Divider ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ flex: 1, height: 1, background: 'var(--border-dark)' }} />
+        <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>or manual inject</span>
+        <div style={{ flex: 1, height: 1, background: 'var(--border-dark)' }} />
+      </div>
 
       {/* Zone selector */}
       <div>

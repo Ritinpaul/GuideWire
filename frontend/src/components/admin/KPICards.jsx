@@ -10,8 +10,8 @@ export default function KPICards({ stats, loading }) {
       delta:   stats?.policies_delta  ?? '—',
       icon:    '🛡️',
       color:   'var(--lime)',
-      bg:      'rgba(200,230,74,0.08)',
-      border:  'rgba(200,230,74,0.2)',
+      bg:      'rgba(184,255,0,0.08)',
+      border:  'rgba(184,255,0,0.2)',
     },
     {
       label:   'Claims Today',

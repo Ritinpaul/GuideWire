@@ -150,8 +150,8 @@ cd backend && npm install
 docker-compose up -d
 
 # Verify services are healthy
-curl http://localhost:3000/health
-curl http://localhost:8000/health
+curl http://localhost:3001/health
+curl http://localhost:8003/health
 curl http://localhost:8001/health
 curl http://localhost:8002/health
 ```
@@ -210,10 +210,10 @@ docker exec -it guidewire-postgres psql -U postgres -d guidewire -c \
   "SELECT * FROM workers WHERE name = 'Rahul Sharma';"
 
 # Test trigger injection
-curl -X POST http://localhost:3000/api/admin/triggers/inject \
+curl -X POST http://localhost:3001/api/v1/triggers/inject \
   -H "Authorization: Bearer admin-test-token" \
   -H "Content-Type: application/json" \
-  -d '{"event_type":"HEAVY_RAIN","location":"Andheri West","dsi_score":82}'
+  -d '{"zone_id":"<zone-uuid>","type":"HEAVY_RAIN","severity_value":7.2,"dsi_score":82}'
 ```
 
 ## 📊 Success Criteria

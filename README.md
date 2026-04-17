@@ -1,58 +1,69 @@
+<div align="center">
+
 # 🛡️ GIGASHIELD NEXUS
 
-### AI-Powered Parametric Microinsurance for Gig Workers
+### AI-Powered Parametric Microinsurance for India's Gig Workers
 
-> **Team Nuuvixx** | Guidewire DevTrails Hackathon 2026  
-> *"Not insurance. Income protection in 3 minutes."*
+> **Team Nuuvixx** | Guidewire DevTrails Hackathon 2026
 
-[![Built With](https://img.shields.io/badge/Built%20With-React%20%7C%20Node.js%20%7C%20FastAPI%20%7C%20PyTorch-blue?style=for-the-badge)](https://github.com/Ritinpaul/GuideWire)
-[![Platform](https://img.shields.io/badge/Platform-PWA%20%2B%20WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://github.com/Ritinpaul/GuideWire)
-[![License](https://img.shields.io/badge/Hackathon-Guidewire%20DevTrails%202026-orange?style=for-the-badge)](https://github.com/Ritinpaul/GuideWire)
+[![React 18](https://img.shields.io/badge/React%2018-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![Node.js 20](https://img.shields.io/badge/Node.js%2020-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL%2016-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgresql.org)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
+[![Guidewire](https://img.shields.io/badge/Guidewire-DevTrails%202026-FF6B00?style=for-the-badge)](https://guidewire.com)
+
+*"Not insurance. Income protection in 3 minutes."*
+
+[![Demo Video](https://img.shields.io/badge/🎬_Demo_Video-Watch_Now-B8FF00?style=for-the-badge)](https://drive.google.com/file/d/14ga3pqhmhaUCemufXEPR6od2vAh0Gc0f/view?usp=sharing)
+[![Telegram Bot](https://img.shields.io/badge/🤖_Telegram_Bot-Try_It-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/Gigasheild_bot)
+[![GitHub](https://img.shields.io/badge/📦_Source_Code-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ritinpaul/GuideWire)
+
+</div>
 
 ---
 
-## Phase 0 Quick Start
+## 💡 The Problem
+
+Every day, **12 million** gig delivery workers in India face an invisible tax on their income: **weather**. A 30-minute rainstorm in Mumbai wipes out an entire shift's earnings (₹500–₹800). Across monsoon season, that compounds to **₹12,000+ in lost income** — devastating for someone earning less than ₹15,000/month.
+
+> *Why does crop insurance exist for farmers, but **zero** income protection products exist for urban gig workers whose livelihoods are just as weather-dependent?*
+
+Traditional insurance fails here: monthly premiums don't match daily pay cycles, 30-day claims don't help someone who needs money *today*, and app-based onboarding fails when your user base has never downloaded anything beyond WhatsApp.
+
+**GIGASHIELD NEXUS** is the answer — a system where the *weather itself* triggers your payout, and the money lands in your UPI wallet before the rain stops.
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Docker Desktop (with Compose v2)
 
-### One-command local startup
+### One-Command Launch
 
 ```bash
 docker compose --env-file .env.development up --build
 ```
 
-This starts all Phase 0 services:
+| Service | Port | Health Check |
+|---------|------|-------------|
+| **Frontend** (Vite + React) | [localhost:5173](http://localhost:5173) | — |
+| **Backend** (Express) | [localhost:3001](http://localhost:3001/health) | `/health` |
+| **Shield-SAC** (ML Pricing) | [localhost:8001](http://localhost:8001/health) | `/health` |
+| **PADS** (Fraud Detection) | [localhost:8002](http://localhost:8002/health) | `/health` |
+| **DSI** (Disruption Index) | [localhost:8003](http://localhost:8003/health) | `/health` |
+| **PostgreSQL 16** | 5432 | — |
+| **Redis 7** | 6379 | — |
 
-- postgres on 5432
-- redis on 6379
-- backend on 3001
-- shield-sac on 8001
-- pads on 8002
-- dsi on 8003
-- frontend (Vite) on 5173
+### Admin Access
 
-### Health checks
+1. Open `http://localhost:5173/admin/login`
+2. Credentials are loaded from `.env.development` (`ADMIN_USERNAME` / `ADMIN_PASSWORD`)
+3. JWT token is used for all admin REST endpoints and WebSocket channels
 
-- http://localhost:3001/health
-- http://localhost:8001/health
-- http://localhost:8002/health
-- http://localhost:8003/health
-
-### Admin login (JWT)
-
-- Open `http://localhost:5173/admin/login`
-- Default credentials (from docker-compose defaults):
-  - username: `admin`
-  - password: `admin123`
-- On success, frontend stores a JWT token and uses it for:
-  - `/api/v1/admin/*` REST endpoints
-  - `/ws?role=admin&token=...` WebSocket channel
-
-### Database verification
-
-Open a shell in postgres container and run:
+### Database Verification
 
 ```bash
 docker compose exec postgres psql -U gigashield -d gigashield -c "SELECT COUNT(*) AS zones FROM zones;"
@@ -60,41 +71,20 @@ docker compose exec postgres psql -U gigashield -d gigashield -c "SELECT COUNT(*
 docker compose exec postgres psql -U gigashield -d gigashield -c "SELECT COUNT(*) AS triggers FROM triggers;"
 ```
 
-Expected minimums after seed load:
-
-- zones: 25
-- workers: 50
-- triggers: 75
-
----
-
-## 💡 Inspiration
-
-Every day, **12 million** gig delivery workers in India — riders for *Zepto*, *Blinkit*, and *Swiggy Instamart* — face an invisible tax on their income: **weather**.
-
-A 30-minute rainstorm in Mumbai can wipe out an entire shift's earnings (₹500–₹800) for every active delivery partner in the affected zone. Across monsoon season, that adds up to **₹12,000+** in lost income per worker — devastating for someone earning less than ₹15,000/month.
-
-We asked ourselves:
-> *Why does crop insurance exist for farmers, but **zero** income protection products exist for urban gig workers whose livelihoods are just as weather-dependent?*
-
-The answer was clear — traditional insurance doesn't work here. Monthly premiums don't match daily pay cycles. 30-day claim processes don't help someone who needed money *yesterday*. And app-based onboarding fails when your user base speaks Tamil, Marathi, or Hindi and has never downloaded anything beyond WhatsApp.
-
-That's what sparked **GIGASHIELD NEXUS**: a system where the *weather itself* triggers your payout, and the money lands in your UPI wallet before the rain even stops.
+Expected: **25** zones, **50** workers, **75** triggers.
 
 ---
 
 ## 🔍 What It Does
 
-**GIGASHIELD NEXUS** is a fully automated, AI-powered *parametric* microinsurance platform. Here's what that means in plain English:
-
 ```
 Worker subscribes weekly (₹15–₹50) via WhatsApp or PWA
     ↓
-AI calculates personalized premium based on zone risk + weather forecast
+AI calculates personalized premium with SHAP explainability in Hindi/English
     ↓
-System continuously monitors weather, traffic, and disruption data
+System monitors 25 zones across 5 cities with live weather data
     ↓
-Disruption detected → Claim auto-created → Fraud check → Payout via UPI
+Disruption detected → Claim auto-created → 5-layer fraud check → UPI payout
     ↓
 Worker receives ₹200–₹800 in under 3 minutes. Zero paperwork.
 ```
@@ -103,101 +93,129 @@ Worker receives ₹200–₹800 in under 3 minutes. Zero paperwork.
 
 | Feature | Description |
 |---------|-------------|
-| **Shield-SAC Pricing** | Deep Reinforcement Learning with a mathematical fairness guarantee — premium ***cannot*** exceed 5% of weekly earnings |
-| **PADS Fraud Detection** | Physics-based fraud prevention using smartphone **IMU sensors** — GPS spoofers can't fake accelerometer data |
-| **Disruption Severity Index (DSI)** | Composite score: `weather × 0.40 + traffic × 0.30 + order volume × 0.30` — not binary on/off triggers |
-| **Zero-Touch Claims** | Trigger → Validate → Pay in **<3 minutes** with zero human intervention |
-| **WhatsApp-First Onboarding** | Sign up in *Hindi / Marathi / Tamil / Telugu* without downloading an app — **73 seconds flat** |
-| **Shield Pools** | Community micro-insurance groups with **15–20% premium discounts** via collective risk sharing |
-| **XAI Transparency** | Every premium explained with [SHAP](https://shap.readthedocs.io/) waterfall charts — no black boxes |
+| **Shield-SAC Pricing** | RL agent with mathematical fairness guarantee — premium ***cannot*** exceed 5% of weekly earnings |
+| **PADS Fraud Detection** | 5-layer pipeline with **IMU sensor validation** — GPS spoofers can't fake accelerometer physics |
+| **Disruption Severity Index** | Composite score: `weather × 0.40 + traffic × 0.30 + orders × 0.30` — not binary triggers |
+| **🛰️ Live Weather Scan** | Real-time scan of all 25 zones → auto-trigger claims when DSI ≥ 65 |
+| **🔬 PADS Physics Demo** | Side-by-side spoofer vs rider comparison making novel fraud detection visible |
+| **Zero-Touch Claims** | Trigger → Validate → Pay in **< 3 minutes** with zero human intervention |
+| **WhatsApp + Telegram** | Sign up in Hindi/English via [Telegram Bot](https://t.me/Gigasheild_bot) or WhatsApp — **73 seconds** |
+| **XAI Transparency** | Every premium explained with SHAP waterfall charts — no black boxes |
 
 ### Three-Tier Coverage
 
 | Tier | Weekly Premium | Weekly Coverage | Payout Range |
 |:----:|:--------------:|:--------------:|:------------:|
-| 🟢 **LOW** | ₹15 | ₹1,000 | ₹100–₹300 |
-| 🟡 **MEDIUM** | ₹30 | ₹2,500 | ₹200–₹500 |
-| 🔴 **HIGH** | ₹50 | ₹5,000 | ₹400–₹800 |
+| 🟢 **Basic Shield** | ₹15 | ₹1,500 | ₹100–₹300 |
+| 🟡 **Pro Shield** | ₹30 | ₹3,000 | ₹200–₹500 |
+| 🔴 **Elite Shield** | ₹50 | ₹5,000 | ₹400–₹800 |
 
 ### DSI-Based Graduated Payouts
 
-Instead of simple binary triggers (*"rain > X mm → pay"*), we compute a **Disruption Severity Index** every 5 minutes per zone:
-
 $$DSI = 0.40 \times Weather + 0.30 \times Traffic + 0.30 \times Orders$$
 
-| DSI Score | Severity | Action | Payout |
-|:---------:|:--------:|--------|:------:|
-| 0–30 | 🟢 LOW | No action | — |
-| 31–50 | 🟡 MODERATE | Alert sent | — |
-| 51–65 | 🟠 ELEVATED | Monitoring intensified | — |
-| 66–80 | 🔴 HIGH | Claim auto-created | **50%** of coverage |
-| 81–90 | 🟣 SEVERE | Claim auto-created | **75%** of coverage |
-| 91–100 | ⚫ CATASTROPHIC | Claim + pool activation | **100%** of coverage |
+| DSI Score | Severity | Payout |
+|:---------:|:--------:|:------:|
+| 0–50 | 🟢 Normal | — |
+| 51–65 | 🟠 Elevated | Monitoring intensified |
+| 66–80 | 🔴 High | **50%** of coverage |
+| 81–90 | 🟣 Severe | **75%** of coverage |
+| 91–100 | ⚫ Catastrophic | **100%** of coverage |
 
-> **Why this matters:** A DSI of 75 (*moderate rain + severe traffic + order collapse*) triggers a payout even when no single metric crosses its individual threshold — because the *combined* disruption is what kills earnings.
+> **Why DSI matters:** A score of 75 (*moderate rain + severe traffic + order collapse*) triggers a payout even when no single metric crosses its individual threshold — because the *combined* disruption kills earnings.
 
 ---
 
-## 🛠️ How We Built It
+## 🎨 Design System & UI/UX
 
-### Architecture Overview
+GIGASHIELD features a **unified design language** across all screens, built with a custom design system:
 
-We designed a **three-layer architecture** separating concerns cleanly:
+### Design Tokens
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| **Primary Background** | `#F5F5F0` (Cream) | Landing page, dashboard, claims |
+| **Card Surface** | `#FFFFFF` | White cards with subtle shadows |
+| **Dark Cards** | `#1A1A1A` | Shield status, quick routes, feature cards |
+| **Accent** | `#B8FF00` (Neon Lime) | CTAs, active states, highlights |
+| **Typography** | Space Grotesk + Inter | Headings + body text |
+
+### Key UI Screens
+
+| Screen | Description |
+|--------|-------------|
+| **Landing Page** | Full-width cream layout with animated map pin, rain effects, floating clouds, pricing cards, testimonials |
+| **Onboarding Wizard** | Floating dark card with multi-step wizard — language, personal, UPI, plan selection with SHAP explanation |
+| **Worker Dashboard** | Full-screen cream background with dark shield card, DSI risk gauge, dynamic 7-day forecast, quick routes |
+| **Claims History** | Full-screen light theme, white expandable claim cards, PADS fraud score bars, semantic status badges |
+| **Storm Mode** | Full-screen red gradient with live Leaflet map, animated pipeline progress, confetti on payout |
+| **Admin War Room** | Dark dashboard with KPIs, DSI heatmap, PADS physics demo, XAI panel, fraud monitor |
+
+### Responsive Architecture
+
+- **Mobile-first**: All layouts work seamlessly on 360px–1536px+ viewports
+- **Content containers**: Max-width 1280px centered content for readability on large screens
+- **Glassmorphism**: Frosted-glass bottom navigation with `backdrop-filter: blur(24px)`
+- **Micro-animations**: Pulse effects, skeleton loading, smooth transitions, confetti celebrations
+
+---
+
+## 🔗 Guidewire Product Integration
+
+| GIGASHIELD Component | Guidewire Equivalent | What It Proves |
+|---------------------|---------------------|---------------|
+| **Shield-SAC** (AI Pricing) | **RatingEngine / PolicyCenter** | Automated, compliant premium calculation with embedded fairness constraints |
+| **PADS** (Fraud Detection) | **ClaimCenter + FraudBuster** | Multi-layer claim validation with novel physics-aware anti-spoofing |
+| **DSI Calculator** | **HazardHub / RiskManager** | Real-time geographic risk scoring with composite multi-factor triggers |
+| **Trigger Pipeline** | **Gateway / BRE** | Event-driven policy execution with automated claim-to-payout orchestration |
+| **SHAP Explainability** | **Analytics / DataHub** | Decision transparency for regulatory compliance and customer trust |
+
+---
+
+## 🏗 Architecture
 
 ```
 ┌───────────────────────────────────────────────────────────┐
 │  LAYER 3: INTELLIGENCE (Python Microservices)             │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────┐  │
 │  │ Shield-SAC   │ │ PADS Fraud   │ │ DSI Calculator   │  │
-│  │ (FastAPI +   │ │ (FastAPI +   │ │ (Disruption      │  │
-│  │  PyTorch)    │ │  SciPy)      │ │  Severity Index) │  │
+│  │ (FastAPI +   │ │ (FastAPI +   │ │ (Live Weather +  │  │
+│  │  XGBoost)    │ │  SciPy)      │ │  Dynamic Traffic)│  │
 │  └──────┬───────┘ └──────┬───────┘ └──────┬───────────┘  │
 ├─────────┼────────────────┼────────────────┼──────────────┤
-│  LAYER 2: CORE ENGINE (Node.js + Express)                 │
+│  LAYER 2: CORE ENGINE (Node.js + Express + WebSocket)     │
 │  ┌────────────────────────────────────────────────────┐   │
-│  │ Integration Gateway (Oracles: Weather, Traffic,    │   │
-│  │ Civic Data, Platform Orders)                       │   │
-│  ├────────────┬───────────────┬────────────────────┐  │   │
-│  │ Policy     │ Claim         │ Payout Service     │  │   │
-│  │ Service    │ Service       │ (Razorpay UPI)     │  │   │
-│  └────────────┴───────────────┴────────────────────┘  │   │
+│  │ Policy Service │ Claim Service │ Payout (Razorpay) │   │
+│  │ JWT Auth │ Rate Limiting │ Zod Validation          │   │
+│  └────────────────────────────────────────────────────┘   │
 ├───────────────────────────────────────────────────────────┤
-│  LAYER 1: EXPERIENCE (React PWA + WhatsApp Bot)           │
+│  LAYER 1: EXPERIENCE (React PWA + Telegram + WhatsApp)    │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────┐  │
-│  │ Worker PWA   │ │ Admin Dash   │ │ WhatsApp Bot     │  │
-│  │ (Onboarding, │ │ (DSI Heatmap,│ │ (Hindi/Tamil/    │  │
-│  │  Storm Mode) │ │  XAI Panel)  │ │  Telugu/Marathi) │  │
+│  │ Worker PWA   │ │ Admin War    │ │ Telegram +       │  │
+│  │ (Dashboard,  │ │ Room (PADS   │ │ WhatsApp Bot     │  │
+│  │  Storm Mode) │ │ Demo, XAI)   │ │ (73s onboarding) │  │
 │  └──────────────┘ └──────────────┘ └──────────────────┘  │
 └───────────────────────────────────────────────────────────┘
+         ↕                ↕                ↕
+    PostgreSQL 16      Redis 7      OpenWeatherMap 3.0
 ```
 
 ### Tech Stack
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| **Frontend** | React 18.3+ / Tailwind CSS 3.4+ | Hooks, Suspense, utility-first rapid prototyping |
-| **Charts & Maps** | [Recharts](https://recharts.org/) + [Leaflet](https://leafletjs.com/) | DSI visualization + zone heatmaps |
-| **Backend** | Node.js 20 LTS + Express | REST APIs, webhook handling, integration layer |
-| **ML Services** | Python 3.11+ / [FastAPI](https://fastapi.tiangolo.com/) | Async ML inference with auto-generated OpenAPI docs |
-| **ML/DRL** | [PyTorch 2.x](https://pytorch.org/) | Shield-SAC training + inference |
-| **ML Utilities** | Scikit-learn, [SHAP](https://shap.readthedocs.io/), NumPy, SciPy | Anomaly detection, XAI, IMU kinematics |
-| **Database** | PostgreSQL 16+ | Relational with JSONB for flexible schemas |
-| **Cache** | Redis 7+ | DSI score caching (5-min TTL), session management |
-| **Messaging** | Twilio WhatsApp Business API | Regional language bot with template messages |
-| **Payments** | [Razorpay](https://razorpay.com/) Instant Payout (Sandbox v2) | UPI instant disbursement with webhook support |
-| **Weather** | [OpenWeatherMap 3.0](https://openweathermap.org/api) | Real-time weather data for 5 Indian metro cities |
-| **Infra** | Docker + Docker Compose / GitHub Actions | Containerized services + CI/CD pipeline |
+| Layer | Technology | Role |
+|-------|-----------|------|
+| **Frontend** | React 18 · Vite 5 · Leaflet · Canvas Confetti | PWA with bilingual UI, DSI maps, SHAP charts |
+| **Backend** | Node.js 20 · Express · Zod · JWT · WebSocket | REST APIs, real-time events, trigger pipeline |
+| **ML Services** | FastAPI · XGBoost · SHAP · Scikit-learn | Pricing, fraud detection, disruption scoring |
+| **Database** | PostgreSQL 16 (7 tables, 6 enums, 12 indexes) | Relational with JSONB for flexible schemas |
+| **Cache** | Redis 7 (5-min TTL) | DSI score caching, session management |
+| **Payments** | Razorpay Instant Payout API | UPI instant disbursement |
+| **Weather** | OpenWeatherMap 3.0 | Real-time data for 5 Indian metros |
+| **Infra** | Docker Compose (7 services) | Full containerized deployment |
 
 ### AI/ML Deep Dive
 
-#### 1. Shield-SAC — Dynamic Premium Pricing
-
-A **Soft Actor-Critic** reinforcement learning agent with a safety shield:
-
-- **State space:** 17 dimensions (weather forecast, zone risk, worker profile, temporal features)
-- **Output:** Personalized `premium_amount` (₹15–₹50) + `coverage_amount` (₹1,000–₹5,000)
-- **Safety shield:** Hard mathematical constraint — `premium ≤ 5% of weekly earnings` — enforced *in the algorithm*, not just as a business rule
-- **Explainability:** SHAP values explain the top 5 factors driving each worker's premium
+#### Shield-SAC — Dynamic Premium Pricing
 
 ```json
 {
@@ -214,27 +232,17 @@ A **Soft Actor-Critic** reinforcement learning agent with a safety shield:
 }
 ```
 
-The reward function balances profitability with fairness:
-
 $$R = 1.0 \times premium - 1.2 \times payout - 10.0 \times fairness\_violation - 2.0 \times churn$$
 
-> **Fallback:** If DRL doesn't converge → XGBoost Regressor + fairness post-processing (same SHAP explainability, 10-minute training time).
-
-#### 2. PADS — Physics-Aware Disruption Sensing (Fraud Detection)
-
-A **5-layer fraud detection pipeline** with a novel physics-based validation layer:
+#### PADS — Physics-Aware Fraud Detection
 
 | Layer | Check | Method |
 |:-----:|-------|--------|
 | **L1** | Device integrity | SafetyNet / Play Integrity attestation |
-| **L2** | GPS-IP consistency | Haversine distance < 5km + IP geolocation match |
-| **L3** | **IMU kinematics** *(novel)* | Accelerometer variance > 0.5 + gyroscope FFT + step count |
-| **L4** | Duplicate prevention | Database `UNIQUE` constraint (policy_id + trigger_id) |
+| **L2** | GPS-IP consistency | Haversine distance < 5km + IP geolocation |
+| **L3** | **IMU kinematics** *(novel)* | Accelerometer variance + gyroscope FFT |
+| **L4** | Duplicate prevention | Database UNIQUE constraint |
 | **L5** | Behavioral anomaly | Isolation Forest on claim patterns |
-
-> **Why Layer 3 matters:** GPS spoofers generate fake coordinates, but they ***cannot*** generate matching accelerometer/gyroscope data. A phone on a desk has zero movement variance — our IMU check catches this.
-
-Fraud score aggregation:
 
 $$fraud = 0.15 \times L1 + 0.25 \times L2 + 0.25 \times L3 + 0.15 \times L4 + 0.20 \times L5$$
 
@@ -246,7 +254,7 @@ $$fraud = 0.15 \times L1 + 0.25 \times L2 + 0.25 \times L3 + 0.15 \times L4 + 0.
 
 ### Database Schema
 
-**7 tables | 6 ENUMs | 12 indexes** — designed for fast claim processing:
+**7 tables · 6 ENUMs · 12 indexes** — designed for fast claim processing:
 
 ```
 workers ──► policies ──► claims ──► payouts
@@ -258,75 +266,40 @@ workers ──► policies ──► claims ──► payouts
 
 ---
 
-## 🧱 Challenges We Ran Into
+## 🧱 Challenges We Overcame
 
-1. **Parametric trigger calibration** — Setting thresholds that are sensitive enough to protect workers but not so aggressive they bankrupt the system. We solved this with the *DSI composite score* instead of binary triggers, allowing graduated payouts that match actual disruption severity.
-
-2. **Fairness in AI pricing** — A naive reinforcement learning agent would charge high-risk workers unaffordable premiums. We implemented the *"Shield" constraint* directly in the SAC algorithm's action space, mathematically guaranteeing premiums never exceed 5% of weekly earnings.
-
-3. **Fraud detection without over-blocking** — GPS validation alone produces too many false positives (workers in basements, tunnels, etc.). Adding IMU kinematic validation (*Layer 3*) dramatically reduced false flags while catching actual GPS spoofers.
-
-4. **Sub-3-minute claim processing** — Orchestrating weather detection → claim creation → 5-layer fraud check → UPI payout in under 180 seconds required careful pipeline parallelization and Redis caching of DSI scores.
-
-5. **Multilingual WhatsApp onboarding** — Designing a conversational flow that works for a Tamil-speaking worker with basic digital literacy in under 90 seconds, without any app download.
-
-6. **Data scarcity for DRL training** — No historical dataset of gig worker insurance claims exists. We generated **50,000 synthetic worker-weeks** using IMD weather data combined with mock worker profiles to pre-train Shield-SAC.
+1. **Parametric trigger calibration** — Solved with DSI composite scoring and graduated payouts instead of binary thresholds
+2. **Fairness in AI pricing** — Embedded the constraint directly in the SAC algorithm's action space — mathematically impossible to violate
+3. **Fraud detection without over-blocking** — IMU kinematic validation (Layer 3) dramatically reduced false positives while catching GPS spoofers
+4. **Sub-3-minute claim processing** — Pipeline parallelization + Redis DSI caching + 5-layer PADS running concurrently
+5. **Multilingual WhatsApp onboarding** — Conversational flow for workers with basic digital literacy, in under 73 seconds
+6. **Data scarcity for ML training** — Generated 50,000 synthetic worker-weeks using IMD weather data + mock profiles
+7. **UI/UX consistency at scale** — Built a custom design system with shared tokens (`#F5F5F0` / `#1A1A1A` / `#B8FF00`) ensuring visual cohesion across 9 screens
 
 ---
 
-## 🏆 Accomplishments That We're Proud Of
+## 🏆 Key Accomplishments
 
-- **73-second WhatsApp onboarding** — A Tamil-speaking worker with basic digital literacy can subscribe via WhatsApp in under 90 seconds, with zero app downloads and zero forms
-
-- **2 min 30 sec end-to-end claim pipeline** — From weather event detection to UPI credit in the worker's account, fully automated with zero human intervention
-
-- **Mathematical fairness guarantee** — Not a business rule or a cap — the Shield-SAC algorithm literally *cannot* output a premium exceeding 5% of weekly earnings. It's a constraint in the optimization space.
-
-- **Novel IMU-based fraud detection** — Layer 3 of PADS uses accelerometer + gyroscope data to verify physical presence. GPS spoofers can fake coordinates but can't fake physics.
-
-- **Composite DSI scoring** — Moving beyond binary triggers to a weighted severity index that captures *compound disruptions* (moderate rain + severe traffic + order collapse = severe impact, even when no single factor crosses its threshold)
-
-- **Shield Pools** — Community micro-insurance groups that reduce premiums 15–20% while strengthening trust through social accountability
-
-- **Full XAI transparency** — Every premium decision explained with SHAP waterfall charts showing the exact impact of each factor — *"Your premium is ₹42 because: rain probability 72% (+₹8.20), flood zone (+₹6.10), clean history (−₹4.80)..."*
+- ⚡ **73-second** WhatsApp onboarding — zero app downloads, zero forms
+- 🕐 **< 3 minute** end-to-end claim pipeline — trigger detection to UPI credit
+- 🛡️ **Mathematical fairness** — premium cap enforced in the optimization space, not as a business rule
+- 🔬 **Novel IMU fraud detection** — accelerometer + gyroscope verify physical presence (unforgeable)
+- 📊 **Composite DSI scoring** — captures compound disruptions that binary triggers miss
+- 🛰️ **Live weather integration** — real-time scan → auto-trigger across 25 zones
+- 🧠 **Full XAI transparency** — SHAP waterfall charts in Hindi showing every pricing factor
+- 🎨 **Premium unified UI** — cream/dark dual-tone design language consistent from landing page to dashboard
+- 🔗 **Guidewire alignment** — maps to PolicyCenter, ClaimCenter, HazardHub, and DataHub
 
 ---
 
-## 📚 What We Learned
+## 🚀 What's Next
 
-- **Parametric insurance > indemnity insurance** for populations with irregular income — the speed of payout matters more than the amount. A worker who gets ₹400 in 3 minutes values it more than ₹600 in 30 days.
-
-- **WhatsApp is infrastructure in India**, not just a messaging app. Designing WhatsApp-first (not app-first) fundamentally changed our architecture and improved accessibility for workers who would never download a standalone app.
-
-- **Composite risk scoring outperforms binary triggers.** Individual weather thresholds miss the reality that a *combination* of moderate factors can be just as disruptive as a single extreme one.
-
-- **Fairness constraints in ML must be mathematical, not procedural.** Business-rule caps can be bypassed by adversarial optimization. Embedding the constraint in the algorithm's action space makes it *structurally impossible* to violate.
-
-- **Physics > GPS for fraud prevention.** Smartphone IMU sensors (accelerometer, gyroscope) provide an unforgeable signal about physical activity that no software-based GPS spoofing can replicate.
-
-- **Weekly pricing matches gig worker psychology.** ₹30/week feels manageable; ₹120/month feels expensive — even though it's the same money. Aligning payment cycles with income cycles drives adoption.
-
----
-
-## 🚀 What's Next for GIGASHIELD NEXUS
-
-| Phase | Timeline | Focus |
-|-------|----------|-------|
-| **Core Dev** | Weeks 3–4 | PostgreSQL schema + seed data, Worker & Policy APIs, Shield-SAC training, Parametric trigger engine, React PWA (6 screens), Weather API integration |
-| **Intelligence** | Weeks 5–6 | Zero-touch claim pipeline, PADS 5-layer fraud service, Razorpay sandbox payouts, XAI dashboard, WhatsApp bot (Hindi + English), Admin dashboard |
-| **Polish** | Weeks 7–8 | E2E testing, UI animations, Shield Pool feature, 10-slide pitch deck, 5-minute demo video, deployment |
-
-### Future Vision
-
-- **Platform partnerships** — Zepto/Blinkit/Swiggy subsidize premiums for worker retention, reducing churn for platforms while protecting earnings for workers
-
-- **Government integration** — Align with [PMJJBY](https://www.jansuraksha.gov.in/) and [Bima Sugam](https://www.irdai.gov.in/) for regulatory sandbox approval and distribution at scale
-
-- **Data licensing** — Anonymized disruption data for urban planners, civic bodies, and disaster management agencies
-
-- **Reinsurance** — Partner with large insurers for risk distribution as we scale beyond 100K workers
-
-- **Geographic expansion** — Jakarta, Manila, Lagos — any city with gig workers and weather risk
+| Phase | Focus |
+|-------|-------|
+| **Immediate** | Pre-storm income forecasting · Real-time traffic API · Durable payout orchestration |
+| **6 months** | Platform partnerships (Zepto, Blinkit, Swiggy) for subsidized worker protection |
+| **1 year** | IRDAI regulatory sandbox approval · Bima Sugam integration · Reinsurance partnerships |
+| **2 years** | Geographic expansion (Jakarta, Manila, Lagos) · Product expansion (health, vehicle) |
 
 ### Unit Economics at Scale
 
@@ -342,26 +315,60 @@ At 100,000 workers: ₹30L/week   →  ₹15.6Cr/year  (break-even at ~500 worke
 
 ```
 GIGASHIELD/
-├── README.md                 ← You are here
-├── documentation.md          ← Full technical docs & API reference
-├── frontend/                 ← React PWA
-├── backend/                  ← Node.js Express API
-├── ml-services/              ← Python microservices
-│   ├── shield-sac/           ← DRL pricing engine
-│   ├── pads/                 ← Fraud detection pipeline
-│   └── dsi/                  ← Disruption Severity Index
-└── infra/                    ← Docker, CI/CD configs
+├── README.md                     ← You are here
+├── info.md                       ← Detailed project overview & innovations
+├── implementation.md             ← Strategic execution roadmap
+├── documentation.md              ← Full API reference
+├── frontend/                     ← React 18 PWA (Worker + Admin)
+│   └── src/
+│       ├── pages/                 ← 9 screens: Landing, Home, Onboarding,
+│       │                             StormMode, Claims, Payout, Login,
+│       │                             AdminDashboard, AdminAccess
+│       ├── components/            ← BottomNav, ShapWaterfall, PayoutConfetti,
+│       │   ├── admin/              ← KPIs, DSI Heatmap, PADSComparison, XAI
+│       │   └── layout/             ← GigShieldLogo, OnboardingBackground
+│       ├── hooks/                 ← useWebSocket
+│       └── services/              ← API client, language utilities
+├── backend/                      ← Node.js Express API
+│   └── src/
+│       ├── routes/                 ← Auth, Claims, Triggers (+ Live Scan)
+│       ├── middleware/             ← JWT, Rate Limiting, Zod, Error Handler
+│       └── ws/                     ← WebSocket broadcast
+├── ml-services/                  ← Python ML microservices
+│   ├── shield-sac/                 ← DRL pricing engine (XGBoost + SHAP)
+│   ├── pads/                       ← 5-layer fraud detection pipeline
+│   └── dsi/                        ← Disruption Severity Index calculator
+└── docker-compose.yml            ← 7-service orchestration
 ```
 
 ---
 
-## 💬 Tagline
+## 🔒 Security & Compliance
+
+| Area | Implementation |
+|------|---------------|
+| **Authentication** | JWT with expiry enforcement for all admin endpoints |
+| **Rate Limiting** | Sliding window on auth and trigger injection routes |
+| **Input Validation** | Zod schema validation with structured error responses |
+| **CORS** | Environment-specific allowlisting (dev vs production) |
+| **Traceability** | UUID v4 request ID on every API call |
+| **Data Privacy** | DPDPA-2023 compliant — Aadhaar last 4 digits only |
+| **Duplicate Prevention** | Database UNIQUE constraints on policy_id + trigger_id |
+| **Graceful Shutdown** | SIGTERM handling for containerized environments |
+
+---
+
+<div align="center">
+
+### 💬 Tagline
 
 > *"Not insurance. Income protection in 3 minutes."*
 
-> *"बारिश हो या आंधी, आपकी कमाई सुरक्षित है।"*  
+> *"बारिश हो या आंधी, आपकी कमाई सुरक्षित है।"*
 > *(Rain or storm, your earnings are protected.)*
 
 ---
 
-**Built with ❤️ by Team Recursive Minds** | [Guidewire DevTrails Hackathon 2026](https://github.com/Ritinpaul/GuideWire)
+**Built with ❤️ by Team Nuuvixx** | [Guidewire DevTrails Hackathon 2026](https://github.com/Ritinpaul/GuideWire)
+
+</div>

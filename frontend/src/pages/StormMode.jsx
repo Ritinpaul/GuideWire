@@ -144,11 +144,11 @@ export default function StormMode() {
     return () => clearInterval(timerRef.current)
   }, [])
 
-  // Step progression
+  // Step progression — aligned with 8s payout timer
   useEffect(() => {
-    const delays = [0, 3000, 8000, 14000]
+    const delays = [0, 1500, 4000, 7000]
     delays.forEach((delay, idx) => setTimeout(() => setCurrentStep(idx + 1), delay))
-    setTimeout(() => setDone(true), 28000)
+    setTimeout(() => setDone(true), 10000)
   }, [])
 
   const fmtEta = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`

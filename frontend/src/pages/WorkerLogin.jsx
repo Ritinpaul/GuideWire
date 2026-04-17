@@ -4,6 +4,7 @@ import { Loader, LogIn } from 'lucide-react'
 import GigShieldLogo from '../components/layout/GigShieldLogo.jsx'
 import { loginWorker, getErrorMsg } from '../services/api.js'
 import { getStoredLanguage, normalizeLanguage, setStoredLanguage } from '../services/language.js'
+import OnboardingBackground from '../components/layout/OnboardingBackground.jsx'
 
 const COPY = {
   en: {
@@ -68,8 +69,8 @@ export default function WorkerLogin() {
   }
 
   return (
-    <div className="lp-root" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 20 }}>
-      <div className="noise-overlay" />
+    <div className="lp-root" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', padding: 20 }}>
+      <OnboardingBackground />
 
       <div style={{
         width: '100%', maxWidth: 460, padding: 40,
@@ -77,9 +78,11 @@ export default function WorkerLogin() {
         border: '1px solid rgba(255,255,255,0.06)',
         borderRadius: 24, position: 'relative', zIndex: 2,
         boxShadow: '0 24px 48px rgba(0,0,0,0.1)',
-        color: '#F5F5F0'
+        color: '#F5F5F0', overflow: 'hidden'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <div className="noise-overlay" />
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
             <GigShieldLogo size={48} />
           </div>
@@ -138,6 +141,7 @@ export default function WorkerLogin() {
 
         <div style={{ marginTop: 24, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>
           {copy.newUser} <Link to="/onboard" style={{ color: '#B8FF00', fontWeight: 700 }}>{copy.registerOnce}</Link>
+        </div>
         </div>
       </div>
     </div>
