@@ -47,11 +47,11 @@ export default function ShapWaterfall({ explanation, premium }) {
 
       <div style={{
         marginTop: 12, paddingTop: 12,
-        borderTop: '1px solid var(--border)',
+        borderTop: '1px solid rgba(200,230,74,0.08)',
         display: 'flex', justifyContent: 'space-between',
       }}>
         <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Your fair premium</span>
-        <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--amber)' }}>
+        <span style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Space Grotesk', color: 'var(--lime)' }}>
           ₹{premium}/week
         </span>
       </div>

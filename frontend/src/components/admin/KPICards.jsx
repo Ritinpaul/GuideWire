@@ -9,9 +9,9 @@ export default function KPICards({ stats, loading }) {
       value:   stats?.active_policies ?? 0,
       delta:   stats?.policies_delta  ?? '—',
       icon:    '🛡️',
-      color:   'var(--amber)',
-      bg:      'rgba(245,158,11,0.08)',
-      border:  'rgba(245,158,11,0.2)',
+      color:   'var(--lime)',
+      bg:      'rgba(200,230,74,0.08)',
+      border:  'rgba(200,230,74,0.2)',
     },
     {
       label:   'Claims Today',
@@ -28,8 +28,8 @@ export default function KPICards({ stats, loading }) {
       delta:   stats?.loss_ratio != null ? 'Live' : '—',
       icon:    '📊',
       color:   'var(--success)',
-      bg:      'rgba(16,185,129,0.08)',
-      border:  'rgba(16,185,129,0.2)',
+      bg:      'rgba(74,222,128,0.08)',
+      border:  'rgba(74,222,128,0.2)',
     },
     {
       label:   'Fraud Rate',
@@ -37,8 +37,8 @@ export default function KPICards({ stats, loading }) {
       delta:   stats?.fraud_rate != null ? 'Live' : '—',
       icon:    '🔬',
       color:   'var(--success)',
-      bg:      'rgba(16,185,129,0.08)',
-      border:  'rgba(16,185,129,0.2)',
+      bg:      'rgba(74,222,128,0.08)',
+      border:  'rgba(74,222,128,0.2)',
     },
   ]
 
@@ -46,19 +46,19 @@ export default function KPICards({ stats, loading }) {
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
       {cards.map((c, i) => (
         <div key={i} style={{
-          background: c.bg, border: `1px solid ${c.border}`, borderRadius: 16, padding: '20px 22px',
-          transition: 'transform 0.2s',
+          background: c.bg, border: `1.5px solid ${c.border}`, borderRadius: 24, padding: '20px 22px',
+          transition: 'all 0.2s',
           cursor: 'default',
           opacity: loading ? 0.6 : 1,
         }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 8px 24px ${c.border}` }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{c.label}</span>
             <span style={{ fontSize: '1.3rem' }}>{c.icon}</span>
           </div>
-          <div style={{ fontFamily: 'Poppins', fontSize: '2rem', fontWeight: 900, color: c.color, lineHeight: 1, marginBottom: 6 }}>
+          <div style={{ fontFamily: 'Space Grotesk', fontSize: '2rem', fontWeight: 700, color: c.color, lineHeight: 1, marginBottom: 6, letterSpacing: '-0.5px' }}>
             {loading ? <Skeleton w={80} h={32} /> : c.value.toLocaleString()}
           </div>
           <div style={{ fontSize: '0.75rem', color: c.color, fontWeight: 600, opacity: 0.8 }}>{c.delta}</div>

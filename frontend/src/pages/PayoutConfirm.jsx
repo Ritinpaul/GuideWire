@@ -64,7 +64,7 @@ export default function PayoutConfirm() {
   }, [])
 
   const fireConfetti = () => {
-    const colors = ['#F59E0B', '#FCD34D', '#10B981', '#FBBF24', '#fff']
+    const colors = ['#C8E64A', '#DCF587', '#4ADE80', '#FBBF24', '#fff']
     confetti({
       particleCount: 160,
       spread: 90,
@@ -88,39 +88,52 @@ export default function PayoutConfirm() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(160deg, rgba(16,185,129,0.12) 0%, var(--bg-900) 40%)',
+      background: 'linear-gradient(160deg, rgba(200,230,74,0.06) 0%, var(--bg-900) 40%)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '40px 24px',
+      padding: '40px 24px', position: 'relative', overflow: 'hidden',
     }}>
+      {/* Ambient glow */}
+      <div style={{
+        position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%)',
+        width: 500, height: 500,
+        background: 'radial-gradient(circle, rgba(74,222,128,0.08), transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <div className="noise-overlay" />
 
       {/* Check animation */}
       <div style={{
-        width: 90, height: 90, borderRadius: '50%',
-        background: 'var(--success-bg)',
+        width: 96, height: 96, borderRadius: '50%',
+        background: 'rgba(74,222,128,0.1)',
         border: '3px solid var(--success)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        marginBottom: 28,
+        marginBottom: 32, position: 'relative', zIndex: 2,
         animation: visible ? 'fadeInUp 0.6s ease' : 'none',
-        boxShadow: '0 0 40px rgba(16,185,129,0.3)',
+        boxShadow: '0 0 50px rgba(74,222,128,0.25)',
       }}>
-        <CheckCircle size={46} style={{ color: 'var(--success)' }} />
+        <CheckCircle size={48} style={{ color: 'var(--success)' }} />
       </div>
 
       {/* Amount */}
-      <div style={{ textAlign: 'center', marginBottom: 36, animation: visible ? 'fadeInUp 0.7s ease' : 'none' }}>
-        <div style={{ color: 'var(--success)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+      <div style={{ textAlign: 'center', marginBottom: 40, animation: visible ? 'fadeInUp 0.7s ease' : 'none', position: 'relative', zIndex: 2 }}>
+        <div style={{ color: 'var(--success)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>
           {copy.payoutReceived}
         </div>
-        <div style={{ fontFamily: 'Poppins', fontSize: '4rem', fontWeight: 900, lineHeight: 1, color: '#fff', marginBottom: 6 }}>
+        <div style={{ fontFamily: 'Space Grotesk', fontSize: '4.2rem', fontWeight: 700, lineHeight: 1, color: '#fff', marginBottom: 8 }}>
           ₹{Number(payout.amount).toLocaleString(locale)}
         </div>
-        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+        <div style={{ color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
           {TRIGGER_EMOJI[payout.trigger_type] ?? '⚡'} {copy.claimSettled.replace('{trigger}', payout.trigger_type.replace(/_/g,' '))}
         </div>
       </div>
 
       {/* Details card */}
-      <div className="card" style={{ width: '100%', maxWidth: 400, marginBottom: 24, animation: visible ? 'fadeInUp 0.8s ease' : 'none' }}>
+      <div style={{
+        width: '100%', maxWidth: 420, marginBottom: 28,
+        animation: visible ? 'fadeInUp 0.8s ease' : 'none',
+        background: 'var(--bg-800)', border: '1.5px solid var(--border-dark)',
+        borderRadius: 24, padding: 24, position: 'relative', zIndex: 2,
+      }}>
         {[
           [copy.transactionRef, payout.razorpay_ref.slice(0, 20) + (payout.razorpay_ref.length > 20 ? '…' : '')],
           [copy.settledOn, new Date().toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' })],
@@ -128,7 +141,7 @@ export default function PayoutConfirm() {
           [copy.source, 'Razorpay → UPI'],
           [copy.status, copy.completed],
         ].map(([k, v]) => (
-          <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+          <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid rgba(200,230,74,0.06)' }}>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{k}</span>
             <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{v}</span>
           </div>
@@ -136,16 +149,16 @@ export default function PayoutConfirm() {
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 400, animation: visible ? 'fadeInUp 0.9s ease' : 'none' }}>
-        <button className="btn btn-success btn-full" onClick={share}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 420, animation: visible ? 'fadeInUp 0.9s ease' : 'none', position: 'relative', zIndex: 2 }}>
+        <button className="btn btn-success btn-full" onClick={share} style={{ borderRadius: 99, padding: 16 }}>
           <Share2 size={18} /> {copy.shareReceipt}
         </button>
-        <button className="btn btn-ghost btn-full" onClick={() => navigate('/home')}>
+        <button className="btn btn-ghost btn-full" onClick={() => navigate('/home')} style={{ borderRadius: 99, padding: 16 }}>
           <Home size={18} /> {copy.backToShield}
         </button>
       </div>
 
-      <div style={{ marginTop: 32, fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+      <div style={{ marginTop: 36, fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', position: 'relative', zIndex: 2 }}>
         {copy.tagLine}
       </div>
     </div>

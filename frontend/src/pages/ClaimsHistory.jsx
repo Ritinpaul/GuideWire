@@ -67,8 +67,8 @@ function FraudScore({ score }) {
   const color = pct < 30 ? 'var(--success)' : pct < 60 ? 'var(--warning)' : 'var(--danger)'
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ flex: 1, height: 5, borderRadius: 99, background: 'var(--bg-700)', overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 99 }} />
+      <div style={{ flex: 1, height: 5, borderRadius: 99, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 99, transition: 'width 0.6s ease' }} />
       </div>
       <span style={{ fontSize: '0.72rem', fontWeight: 700, color, minWidth: 32 }}>{pct}%</span>
     </div>
@@ -82,16 +82,24 @@ function ClaimCard({ claim, copy, locale }) {
   const dateStr = new Date(claim.created_at).toLocaleString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
   return (
-    <div className="card" style={{ overflow: 'hidden' }}>
+    <div style={{
+      overflow: 'hidden', background: 'var(--bg-800)',
+      border: '1.5px solid var(--border-dark)', borderRadius: 24, padding: 20,
+      transition: 'all 0.3s',
+    }}>
       {/* Header row */}
-      <button onClick={() => setExpanded(e => !e)} style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--bg-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0 }}>
+      <button onClick={() => setExpanded(e => !e)} style={{ width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 14, color: 'var(--text-primary)' }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: 14, background: 'var(--bg-700)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.3rem', flexShrink: 0, border: '1px solid var(--border-dark)',
+        }}>
           {emoji}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
             <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{claim.trigger_type?.replace(/_/g,' ')}</span>
-            <span style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: '1rem', color: claim.status === 'PAID' ? 'var(--success)' : 'var(--text-primary)' }}>
+            <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '1rem', color: claim.status === 'PAID' ? 'var(--success)' : 'var(--text-primary)' }}>
               ₹{Number(claim.claim_amount).toLocaleString(locale)}
             </span>
           </div>
@@ -109,12 +117,12 @@ function ClaimCard({ claim, copy, locale }) {
 
       {/* Expanded details */}
       {expanded && (
-        <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)', animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(200,230,74,0.06)', animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
           {/* Fraud score */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{copy.fraudScore}</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{copy.fraudScore}</span>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{claim.adjudication_type ?? copy.adjudicationAuto}</span>
             </div>
             <FraudScore score={claim.fraud_score} />
@@ -122,23 +130,23 @@ function ClaimCard({ claim, copy, locale }) {
 
           {/* Zone + DSI */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div style={{ background: 'var(--bg-700)', borderRadius: 10, padding: '10px 12px' }}>
+            <div style={{ background: 'var(--bg-700)', borderRadius: 14, padding: '12px 14px', border: '1px solid var(--border-dark)' }}>
               <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: 2 }}>{copy.zone}</div>
               <div style={{ fontSize: '0.82rem', fontWeight: 600 }}>{claim.zone_name ?? '—'}</div>
             </div>
-            <div style={{ background: 'var(--bg-700)', borderRadius: 10, padding: '10px 12px' }}>
+            <div style={{ background: 'var(--bg-700)', borderRadius: 14, padding: '12px 14px', border: '1px solid var(--border-dark)' }}>
               <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: 2 }}>{copy.dsiScore}</div>
-              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--amber)' }}>{Number(claim.dsi_score ?? 0).toFixed(0)}/100</div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--lime)' }}>{Number(claim.dsi_score ?? 0).toFixed(0)}/100</div>
             </div>
           </div>
 
           {/* Fraud logs */}
           {Array.isArray(claim.fraud_logs) && claim.fraud_logs.length > 0 && (
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>{copy.checkResults}</div>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{copy.checkResults}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {claim.fraud_logs.map((log, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', borderRadius: 8, background: 'var(--bg-700)' }}>
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderRadius: 10, background: 'var(--bg-700)', border: '1px solid var(--border-dark)' }}>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{log.check_type?.replace(/_/g,' ')}</span>
                     <span className={`badge ${log.result === 'PASS' ? 'badge-success' : log.result === 'FAIL' ? 'badge-danger' : 'badge-warning'}`} style={{ fontSize: '0.65rem' }}>
                       {log.result}
@@ -189,17 +197,17 @@ export default function ClaimsHistory() {
     <div className="page-container">
       {/* Header */}
       <div style={{ padding: '52px 20px 16px' }}>
-        <div style={{ fontFamily: 'Poppins', fontSize: '1.5rem', fontWeight: 800, marginBottom: 4 }}>{copy.pageTitle}</div>
+        <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.6rem', fontWeight: 700, marginBottom: 4, letterSpacing: '-0.5px' }}>{copy.pageTitle}</div>
         <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{claims.length} {copy.totalClaimsSuffix}</div>
       </div>
 
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
         {/* Search */}
         <div style={{ position: 'relative' }}>
-          <Search size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+          <Search size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input className="input" placeholder={copy.searchPlaceholder}
             value={search} onChange={e => setSearch(e.target.value)}
-            style={{ paddingLeft: 36, fontSize: '0.88rem' }} />
+            style={{ paddingLeft: 38, fontSize: '0.88rem', borderRadius: 16 }} />
         </div>
 
         {/* Filter pills */}
@@ -207,11 +215,11 @@ export default function ClaimsHistory() {
           {FILTERS.map(f => (
             <button key={f} onClick={() => setFilter(f)}
               style={{
-                padding: '6px 14px', borderRadius: 99, whiteSpace: 'nowrap', fontSize: '0.78rem', fontWeight: 600,
-                background: filter === f ? 'var(--amber)' : 'var(--bg-700)',
-                color:      filter === f ? '#fff' : 'var(--text-muted)',
-                border:     filter === f ? '1.5px solid var(--amber)' : '1.5px solid var(--border)',
-                transition: 'all 0.15s',
+                padding: '7px 16px', borderRadius: 99, whiteSpace: 'nowrap', fontSize: '0.78rem', fontWeight: 600,
+                background: filter === f ? 'var(--lime)' : 'var(--bg-700)',
+                color:      filter === f ? 'var(--olive-dark)' : 'var(--text-muted)',
+                border:     filter === f ? '1.5px solid var(--lime)' : '1.5px solid var(--border-dark)',
+                transition: 'all 0.2s',
               }}>{copy.statuses[f] ?? f}</button>
           ))}
         </div>
@@ -219,13 +227,13 @@ export default function ClaimsHistory() {
 
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {loading && (
-          [1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 80, borderRadius: 20 }} />)
+          [1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 80, borderRadius: 24 }} />)
         )}
 
         {!loading && visible.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '48px 0' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🛡️</div>
-            <div style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>{copy.noClaims}</div>
+          <div style={{ textAlign: 'center', padding: '52px 0' }}>
+            <div style={{ fontSize: '3rem', marginBottom: 14 }}>🛡️</div>
+            <div style={{ fontWeight: 700, color: 'var(--text-secondary)', fontFamily: 'Space Grotesk' }}>{copy.noClaims}</div>
             <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 6 }}>{copy.noClaimsDesc}</div>
           </div>
         )}
@@ -233,7 +241,7 @@ export default function ClaimsHistory() {
         {visible.map(c => <ClaimCard key={c.id} claim={c} copy={copy} locale={locale} />)}
 
         {error && (
-          <div style={{ padding: 14, borderRadius: 10, background: 'var(--danger-bg)', color: 'var(--danger)', fontSize: '0.82rem' }}>⚠️ {error}</div>
+          <div style={{ padding: 14, borderRadius: 14, background: 'var(--danger-bg)', color: 'var(--danger)', fontSize: '0.82rem', border: '1px solid rgba(239,68,68,0.15)' }}>⚠️ {error}</div>
         )}
       </div>
 

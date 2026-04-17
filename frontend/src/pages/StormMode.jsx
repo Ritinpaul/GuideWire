@@ -98,11 +98,11 @@ function resolveZoneCoords(zoneId, zoneName) {
 }
 
 const TRIGGER_META = {
-  HEAVY_RAIN:    { emoji: '🌧️', label: 'Heavy Rain',  label_hi: 'भारी बारिश', color: '#3B82F6', ringColor: 'rgba(59,130,246,0.25)' },
-  FLOOD:         { emoji: '🌊', label: 'Flood Alert', label_hi: 'बाढ़ अलर्ट', color: '#1D4ED8', ringColor: 'rgba(29,78,216,0.25)'  },
+  HEAVY_RAIN:    { emoji: '🌧️', label: 'Heavy Rain',  label_hi: 'भारी बारिश', color: '#60A5FA', ringColor: 'rgba(96,165,250,0.25)' },
+  FLOOD:         { emoji: '🌊', label: 'Flood Alert', label_hi: 'बाढ़ अलर्ट', color: '#3B82F6', ringColor: 'rgba(59,130,246,0.25)'  },
   HEATWAVE:      { emoji: '🔥', label: 'Heatwave',    label_hi: 'लू', color: '#EF4444', ringColor: 'rgba(239,68,68,0.25)'  },
   POLLUTION:     { emoji: '🌫️', label: 'High AQI',   label_hi: 'उच्च AQI', color: '#6B7280', ringColor: 'rgba(107,114,128,0.25)'},
-  CURFEW:        { emoji: '🚧', label: 'Civic Event', label_hi: 'नागरिक घटना', color: '#F59E0B', ringColor: 'rgba(245,158,11,0.25)' },
+  CURFEW:        { emoji: '🚧', label: 'Civic Event', label_hi: 'नागरिक घटना', color: '#FBBF24', ringColor: 'rgba(251,191,36,0.25)' },
   COMPOSITE_DSI: { emoji: '⚡', label: 'DSI Alert',   label_hi: 'DSI अलर्ट', color: '#F97316', ringColor: 'rgba(249,115,22,0.25)' },
 }
 
@@ -160,6 +160,8 @@ export default function StormMode() {
       display: 'flex', flexDirection: 'column',
       position: 'relative', overflow: 'hidden',
     }}>
+      <div className="noise-overlay" />
+
       {/* Animated background rings */}
       {[1,2,3].map(i => (
         <div key={i} style={{
@@ -167,9 +169,25 @@ export default function StormMode() {
           transform: 'translate(-50%, -50%)',
           width: `${i * 180}px`, height: `${i * 180}px`,
           borderRadius: '50%',
-          border: '1px solid rgba(239,68,68,0.15)',
+          border: '1px solid rgba(239,68,68,0.12)',
           animation: `pulseDanger ${1.5 + i * 0.4}s infinite`,
           animationDelay: `${i * 0.3}s`,
+          pointerEvents: 'none',
+        }} />
+      ))}
+
+      {/* Rain drops */}
+      {Array.from({ length: 20 }).map((_, i) => (
+        <div key={i} style={{
+          position: 'absolute',
+          left: `${Math.random() * 100}%`,
+          top: `-${Math.random() * 10}%`,
+          width: 2,
+          height: `${10 + Math.random() * 18}px`,
+          background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.15))',
+          borderRadius: '0 0 2px 2px',
+          animation: `rainFall ${0.7 + Math.random() * 0.6}s linear infinite`,
+          animationDelay: `${Math.random() * 2}s`,
           pointerEvents: 'none',
         }} />
       ))}
@@ -178,15 +196,15 @@ export default function StormMode() {
       <div style={{ padding: '52px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 2 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FBBF24', animation: 'pulseDanger 1.5s infinite' }} />
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
             {copy.stormModeActive}
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Link to="/home" style={{ padding: '6px 10px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.82)', fontSize: '0.75rem', fontWeight: 600 }}>
+          <Link to="/home" style={{ padding: '7px 14px', borderRadius: 99, border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem', fontWeight: 600, backdropFilter: 'blur(5px)' }}>
             {copy.home}
           </Link>
-          <Link to="/admin/login" style={{ padding: '6px 10px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.82)', fontSize: '0.75rem', fontWeight: 600 }}>
+          <Link to="/admin/login" style={{ padding: '7px 14px', borderRadius: 99, border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem', fontWeight: 600, backdropFilter: 'blur(5px)' }}>
             {copy.admin}
           </Link>
           <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)' }}>DSI: {dsiPct}/100</div>
@@ -201,25 +219,25 @@ export default function StormMode() {
           <div style={{ fontSize: '5rem', marginBottom: 12, animation: 'heroFloat 2s ease-in-out infinite', display: 'inline-block' }}>
             {meta.emoji}
           </div>
-          <div style={{ fontFamily: 'Poppins', fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>
+          <div style={{ fontFamily: 'Space Grotesk', fontSize: '0.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>
             {triggerLabel} {copy.detected}
           </div>
-          <div style={{ fontFamily: 'Poppins', fontSize: '3.2rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+          <div style={{ fontFamily: 'Space Grotesk', fontSize: '3.4rem', fontWeight: 700, color: '#fff', lineHeight: 1 }}>
             ₹{Number(stormData.claim_amount).toLocaleString(locale)}
           </div>
-          <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.9rem', marginTop: 6 }}>
+          <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', marginTop: 6 }}>
             {copy.incoming}
           </div>
         </div>
 
         {/* Zone map pinpoint */}
-        <div style={{ width: '100%', borderRadius: 18, overflow: 'hidden', border: `2px solid ${meta.color}50`, boxShadow: `0 0 30px ${meta.color}30` }}>
-          <div style={{ padding: '10px 16px', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: '100%', borderRadius: 22, overflow: 'hidden', border: `2px solid ${meta.color}40`, boxShadow: `0 0 40px ${meta.color}20` }}>
+          <div style={{ padding: '12px 16px', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <MapPin size={14} style={{ color: meta.color }} />
             <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
               {copy.affectedZone}: {coords.label}
             </span>
-            <span style={{ marginLeft: 'auto', fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)' }}>
+            <span style={{ marginLeft: 'auto', fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)' }}>
               {coords.lat.toFixed(4)}, {coords.lng.toFixed(4)}
             </span>
           </div>
@@ -253,11 +271,12 @@ export default function StormMode() {
         {!done && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)',
-            padding: '12px 22px', borderRadius: 99,
+            background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(12px)',
+            padding: '14px 24px', borderRadius: 99,
+            border: '1px solid rgba(255,255,255,0.08)',
           }}>
             <Clock size={16} style={{ color: '#FBBF24' }} />
-            <span style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: '1.2rem', color: '#FBBF24' }}>
+            <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '1.2rem', color: '#FBBF24' }}>
               {fmtEta(eta)}
             </span>
             <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.78rem' }}>{copy.eta}</span>
@@ -265,31 +284,32 @@ export default function StormMode() {
         )}
 
         {/* 4-step progress */}
-        <div style={{ width: '100%', background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(12px)', borderRadius: 20, padding: '20px', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ width: '100%', background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(14px)', borderRadius: 24, padding: '22px', border: '1px solid rgba(255,255,255,0.08)' }}>
           {steps.map((s, i) => {
             const isComplete = currentStep > s.id
             const isActive   = currentStep === s.id
             return (
-              <div key={s.id} style={{ display: 'flex', gap: 14, marginBottom: i < steps.length - 1 ? 16 : 0, alignItems: 'flex-start' }}>
+              <div key={s.id} style={{ display: 'flex', gap: 14, marginBottom: i < steps.length - 1 ? 18 : 0, alignItems: 'flex-start' }}>
                 <div style={{
-                  width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                  width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: isComplete ? 'var(--success)' : isActive ? '#FCD34D' : 'rgba(255,255,255,0.1)',
-                  border: `2px solid ${isComplete ? 'var(--success)' : isActive ? '#FCD34D' : 'rgba(255,255,255,0.2)'}`,
-                  transition: 'all 0.3s',
+                  background: isComplete ? 'var(--success)' : isActive ? '#FCD34D' : 'rgba(255,255,255,0.08)',
+                  border: `2px solid ${isComplete ? 'var(--success)' : isActive ? '#FCD34D' : 'rgba(255,255,255,0.15)'}`,
+                  transition: 'all 0.4s',
+                  boxShadow: isComplete ? '0 0 12px rgba(74,222,128,0.3)' : isActive ? '0 0 12px rgba(252,211,77,0.3)' : 'none',
                 }}>
                   {isComplete
                     ? <CheckCircle size={16} style={{ color: '#fff' }} />
                     : isActive
                     ? <Loader size={15} style={{ color: '#000', animation: 'spin 1s linear infinite' }} />
-                    : <span style={{ fontWeight: 800, fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>{s.id}</span>
+                    : <span style={{ fontWeight: 800, fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)' }}>{s.id}</span>
                   }
                 </div>
                 <div style={{ paddingTop: 4 }}>
-                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: isComplete ? '#fff' : isActive ? '#FCD34D' : 'rgba(255,255,255,0.4)' }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: isComplete ? '#fff' : isActive ? '#FCD34D' : 'rgba(255,255,255,0.35)' }}>
                     {s.label}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                  <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
                     {s.sublabel}
                   </div>
                 </div>
@@ -307,7 +327,7 @@ export default function StormMode() {
         {done && (
           <div style={{ textAlign: 'center', animation: 'fadeInUp 0.5s ease' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>✅</div>
-            <div style={{ fontFamily: 'Poppins', fontWeight: 800, color: '#fff', fontSize: '1.1rem' }}>
+            <div style={{ fontFamily: 'Space Grotesk', fontWeight: 700, color: '#fff', fontSize: '1.15rem' }}>
               {copy.payoutInitiated}
             </div>
             <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', marginTop: 4 }}>
@@ -317,9 +337,9 @@ export default function StormMode() {
         )}
 
         {/* PADS badge */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(0,0,0,0.25)', padding: '8px 16px', borderRadius: 99 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(8px)', padding: '9px 18px', borderRadius: 99, border: '1px solid rgba(255,255,255,0.06)' }}>
           <Shield size={13} style={{ color: 'var(--success)' }} />
-          <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)' }}>{copy.padsActive}</span>
+          <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)' }}>{copy.padsActive}</span>
         </div>
       </div>
     </div>

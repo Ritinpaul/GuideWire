@@ -1,33 +1,25 @@
 /**
- * Loading Skeleton Styles
+ * Loading Skeleton Styles — Lime/Olive Theme
  */
 
 .skeleton {
   background: linear-gradient(
     90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
+    var(--bg-700, #2C3E10) 25%,
+    var(--bg-600, #3D5218) 50%,
+    var(--bg-700, #2C3E10) 75%
   );
-  background-size: 200% 100%;
-  animation: loading 1.5s ease-in-out infinite;
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  background-size: 1000px 100%;
+  animation: shimmer 1.8s infinite;
+  border-radius: 16px;
 }
 
 /* Dashboard Card Skeleton */
 .dashboard-card-skeleton {
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-800, #1A2A08);
+  border-radius: 24px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1.5px solid rgba(200, 230, 74, 0.08);
 }
 
 .skeleton-header {
@@ -44,16 +36,14 @@
   justify-content: center;
 }
 
-.skeleton-body {
-  margin-top: 12px;
-}
+.skeleton-body { margin-top: 12px; }
 
 /* Policy Card Skeleton */
 .policy-card-skeleton {
-  background: white;
-  border-radius: 16px;
+  background: var(--bg-800, #1A2A08);
+  border-radius: 28px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid rgba(200, 230, 74, 0.08);
 }
 
 .skeleton-details {
@@ -75,91 +65,54 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  background: var(--bg-800, #1A2A08);
+  border-radius: 24px;
+  border: 1.5px solid rgba(200, 230, 74, 0.08);
 }
 
-.skeleton-left {
-  flex-shrink: 0;
-}
-
-.skeleton-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.skeleton-amount {
-  flex-shrink: 0;
-}
+.skeleton-left { flex-shrink: 0; }
+.skeleton-right { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-amount { flex-shrink: 0; }
 
 /* Table Skeleton */
 .table-skeleton {
-  background: white;
-  border-radius: 8px;
+  background: var(--bg-800, #1A2A08);
+  border-radius: 16px;
   overflow: hidden;
+  border: 1.5px solid rgba(200, 230, 74, 0.08);
 }
 
 .table-header-skeleton {
   display: grid;
   gap: 16px;
   padding: 16px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--bg-700, #2C3E10);
+  border-bottom: 1px solid rgba(200, 230, 74, 0.06);
 }
 
 .table-row-skeleton {
   display: grid;
   gap: 16px;
   padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(200, 230, 74, 0.04);
 }
 
-.table-row-skeleton:last-child {
-  border-bottom: none;
-}
+.table-row-skeleton:last-child { border-bottom: none; }
 
-/* Worker Profile Skeleton */
-.worker-profile-skeleton {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.profile-header-skeleton {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.profile-info-skeleton {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.profile-stats-skeleton {
-  margin-top: 16px;
-}
-
-/* Chart Skeleton */
+/* Chart / Map */
 .chart-skeleton {
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-800, #1A2A08);
+  border-radius: 20px;
   padding: 16px;
+  border: 1.5px solid rgba(200, 230, 74, 0.08);
   position: relative;
   overflow: hidden;
 }
 
-/* Map Skeleton */
 .map-skeleton {
   position: relative;
-  background: #f5f5f5;
-  border-radius: 12px;
+  background: var(--bg-700, #2C3E10);
+  border-radius: 20px;
   overflow: hidden;
 }
 
@@ -168,41 +121,13 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #666;
+  color: var(--text-muted, #6B8A3A);
   font-size: 14px;
   font-weight: 500;
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .skeleton {
-    background: linear-gradient(
-      90deg,
-      #2a2a2a 25%,
-      #1a1a1a 50%,
-      #2a2a2a 75%
-    );
-  }
-
-  .dashboard-card-skeleton,
-  .policy-card-skeleton,
-  .claim-item-skeleton,
-  .table-skeleton,
-  .worker-profile-skeleton,
-  .chart-skeleton {
-    background: #1e1e1e;
-  }
-
-  .table-header-skeleton {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-  }
-
-  .table-row-skeleton {
-    border-color: #2a2a2a;
-  }
-
-  .map-overlay {
-    color: #aaa;
-  }
+/* Responsive */
+@media (max-width: 768px) {
+  .error-state, .empty-state { padding: 32px 16px; min-height: 200px; }
+  .error-icon, .empty-icon { font-size: 48px; }
 }

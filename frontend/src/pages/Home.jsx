@@ -7,10 +7,10 @@ import BottomNav from '../components/BottomNav.jsx'
 import useWebSocket from '../hooks/useWebSocket.js'
 
 const DSI_LEVEL_META = {
-  NORMAL:    { labelKey: 'dsiClear',    color: '#10B981', emoji: '☀️',  bg: 'rgba(16,185,129,0.1)'  },
-  ELEVATED:  { labelKey: 'dsiElevated', color: '#F59E0B', emoji: '🌤️', bg: 'rgba(245,158,11,0.1)'  },
-  HIGH:      { labelKey: 'dsiHighRisk', color: '#F97316', emoji: '⛈️', bg: 'rgba(249,115,22,0.1)'  },
-  CRITICAL:  { labelKey: 'dsiStorm',    color: '#EF4444', emoji: '🌪️', bg: 'rgba(239,68,68,0.14)'  },
+  NORMAL:    { labelKey: 'dsiClear',    color: '#4ADE80', emoji: '☀️',  bg: 'rgba(74,222,128,0.08)'  },
+  ELEVATED:  { labelKey: 'dsiElevated', color: '#FBBF24', emoji: '🌤️', bg: 'rgba(251,191,36,0.08)'  },
+  HIGH:      { labelKey: 'dsiHighRisk', color: '#F97316', emoji: '⛈️', bg: 'rgba(249,115,22,0.08)'  },
+  CRITICAL:  { labelKey: 'dsiStorm',    color: '#EF4444', emoji: '🌪️', bg: 'rgba(239,68,68,0.1)'  },
 }
 
 const DSI_LEVEL_ALIASES = {
@@ -155,46 +155,53 @@ export default function Home() {
   const maxBar = Math.max(...forecast, 1)
 
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ position: 'relative' }}>
+      {/* Ambient glow */}
+      <div style={{
+        position: 'fixed', top: '-20%', right: '-10%', width: 400, height: 400,
+        background: 'radial-gradient(circle, rgba(200,230,74,0.04), transparent 70%)',
+        pointerEvents: 'none', zIndex: 0,
+      }} />
+
       {/* Top bar */}
-      <div style={{ padding: '52px 20px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ padding: '52px 20px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
         <div>
-          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             {copy.good} {getGreeting(language)}
           </div>
-          <div style={{ fontFamily: 'Poppins', fontSize: '1.45rem', fontWeight: 800, marginTop: 2 }}>
+          <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.5rem', fontWeight: 700, marginTop: 4, letterSpacing: '-0.5px' }}>
             {workerName.split(' ')[0]} 👋
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {connected && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--success-bg)', padding: '5px 10px', borderRadius: 99 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(74,222,128,0.1)', padding: '6px 12px', borderRadius: 99, border: '1px solid rgba(74,222,128,0.15)' }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', animation: 'pulse 2s infinite' }} />
               <span style={{ fontSize: '0.7rem', color: 'var(--success)', fontWeight: 700 }}>{copy.live}</span>
             </div>
           )}
-          <button onClick={() => load(true)} style={{ color: 'var(--text-muted)', display: 'flex' }}>
-            <RefreshCw size={18} className={refreshing ? 'animate-spin' : ''} />
+          <button onClick={() => load(true)} style={{ color: 'var(--text-muted)', display: 'flex', padding: 8, borderRadius: 12, background: 'var(--bg-700)', border: '1px solid var(--border-dark)' }}>
+            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
           </button>
         </div>
       </div>
 
-      <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 14, position: 'relative', zIndex: 1 }}>
 
         {/* ── Shield Status Card ── */}
         <div style={{
-          borderRadius: 24, padding: '24px',
+          borderRadius: 28, padding: '28px 24px',
           background: policy
-            ? 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(15,23,42,0.95))'
-            : 'linear-gradient(135deg, rgba(246,68,68,0.1), rgba(15,23,42,0.95))',
-          border: `1.5px solid ${policy ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+            ? 'linear-gradient(135deg, rgba(200,230,74,0.08), rgba(17,29,4,0.95))'
+            : 'linear-gradient(135deg, rgba(239,68,68,0.06), rgba(17,29,4,0.95))',
+          border: `1.5px solid ${policy ? 'rgba(200,230,74,0.15)' : 'rgba(239,68,68,0.2)'}`,
           position: 'relative', overflow: 'hidden',
         }}>
-          <div style={{ position: 'absolute', top: -30, right: -30, fontSize: '8rem', opacity: 0.06, pointerEvents: 'none' }}>🛡️</div>
+          <div style={{ position: 'absolute', top: -30, right: -30, fontSize: '8rem', opacity: 0.04, pointerEvents: 'none' }}>🛡️</div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <div style={{ fontSize: '2.6rem', marginBottom: 8 }} className="animate-shield-pulse">🛡️</div>
-              <div style={{ fontFamily: 'Poppins', fontSize: '1.5rem', fontWeight: 800, marginBottom: 4 }}>
+              <div style={{ fontSize: '2.8rem', marginBottom: 8 }} className="animate-shield-pulse">🛡️</div>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.6rem', fontWeight: 700, marginBottom: 4 }}>
                 ₹{coverage.toLocaleString(locale)}
               </div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{copy.weeklyCoverage}</div>
@@ -202,8 +209,9 @@ export default function Home() {
             <div style={{ textAlign: 'right' }}>
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '6px 14px', borderRadius: 99,
-                background: policy ? 'var(--success-bg)' : 'var(--danger-bg)',
+                padding: '7px 16px', borderRadius: 99,
+                background: policy ? 'rgba(74,222,128,0.1)' : 'var(--danger-bg)',
+                border: `1px solid ${policy ? 'rgba(74,222,128,0.2)' : 'rgba(239,68,68,0.2)'}`,
               }}>
                 <div style={{ width: 7, height: 7, borderRadius: '50%', background: policy ? 'var(--success)' : 'var(--danger)', animation: policy ? 'pulse 2s infinite' : 'none' }} />
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, color: policy ? 'var(--success)' : 'var(--danger)' }}>
@@ -211,16 +219,16 @@ export default function Home() {
                 </span>
               </div>
               {policy && (
-                <div style={{ marginTop: 10, textAlign: 'right' }}>
+                <div style={{ marginTop: 12, textAlign: 'right' }}>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{copy.plan}</div>
-                  <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{planDisplayLabel}</div>
+                  <div style={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--lime)' }}>{planDisplayLabel}</div>
                 </div>
               )}
             </div>
           </div>
 
           {policy && (
-            <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ marginTop: 20, paddingTop: 18, borderTop: '1px solid rgba(200,230,74,0.06)', display: 'flex', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{copy.weeklyPremium}</div>
                 <div style={{ fontWeight: 700, color: 'var(--amber)' }}>₹{premium}/wk</div>
@@ -238,16 +246,19 @@ export default function Home() {
         </div>
 
         {/* ── DSI Zone Card ── */}
-        <div className="card" style={{ background: dsiMeta.bg, borderColor: `${dsiMeta.color}30` }}>
+        <div style={{
+          background: dsiMeta.bg, borderColor: `${dsiMeta.color}20`,
+          border: `1.5px solid ${dsiMeta.color}20`, borderRadius: 24, padding: 20,
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
                 {copy.zoneWeatherRisk}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ fontSize: '1.8rem' }}>{dsiMeta.emoji}</span>
                 <div>
-                  <div style={{ fontWeight: 800, color: dsiMeta.color, fontSize: '1.05rem' }}>{dsiLabel}</div>
+                  <div style={{ fontWeight: 700, color: dsiMeta.color, fontSize: '1.05rem' }}>{dsiLabel}</div>
                   {worker?.zone_name && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                       <MapPin size={11} /> {worker.zone_name}
@@ -257,20 +268,20 @@ export default function Home() {
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontFamily: 'Poppins', fontSize: '2rem', fontWeight: 900, color: dsiMeta.color }}>{dsiScore}</div>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: '2.2rem', fontWeight: 700, color: dsiMeta.color }}>{dsiScore}</div>
               <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{copy.dsiScore}</div>
             </div>
           </div>
 
           {/* DSI bar */}
-          <div style={{ height: 6, borderRadius: 99, background: 'var(--bg-700)', overflow: 'hidden' }}>
+          <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${dsiScore}%`, background: `linear-gradient(90deg, ${dsiMeta.color}80, ${dsiMeta.color})`, borderRadius: 99, transition: 'width 1s ease' }} />
           </div>
         </div>
 
         {/* ── 7-day DSI Forecast ── */}
-        <div className="card">
-          <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 16 }}>
+        <div style={{ background: 'var(--bg-800)', border: '1.5px solid var(--border-dark)', borderRadius: 24, padding: 20 }}>
+          <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 18 }}>
             {copy.forecastTitle}
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 72 }}>
@@ -279,15 +290,14 @@ export default function Home() {
                 <div style={{
                   width: '100%',
                   height: `${(val / maxBar) * 60}px`,
-                  borderRadius: '4px 4px 0 0',
+                  borderRadius: '6px 6px 0 0',
                   background: i === 0
                     ? `linear-gradient(to top, ${dsiMeta.color}cc, ${dsiMeta.color})`
-                    : 'var(--bg-700)',
+                    : 'var(--bg-600)',
                   transition: 'height 0.6s ease',
-                  animationDelay: `${i * 0.05}s`,
                   minHeight: 4,
                 }} />
-                <span style={{ fontSize: '0.58rem', color: i === 0 ? 'var(--amber)' : 'var(--text-muted)', fontWeight: i === 0 ? 700 : 400 }}>
+                <span style={{ fontSize: '0.58rem', color: i === 0 ? 'var(--lime)' : 'var(--text-muted)', fontWeight: i === 0 ? 700 : 400 }}>
                   {forecastLabels[i]}
                 </span>
               </div>
@@ -297,14 +307,14 @@ export default function Home() {
 
         {/* ── Stats row ── */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div className="card" style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: 'Poppins', fontSize: '1.7rem', fontWeight: 800, color: 'var(--amber)' }}>
+          <div style={{ background: 'var(--bg-800)', border: '1.5px solid var(--border-dark)', borderRadius: 24, padding: 20, textAlign: 'center' }}>
+            <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.8rem', fontWeight: 700, color: 'var(--amber)' }}>
               {claims?.total_claims ?? 0}
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>{copy.totalClaims}</div>
           </div>
-          <div className="card" style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: 'Poppins', fontSize: '1.7rem', fontWeight: 800, color: 'var(--success)' }}>
+          <div style={{ background: 'var(--bg-800)', border: '1.5px solid var(--border-dark)', borderRadius: 24, padding: 20, textAlign: 'center' }}>
+            <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.8rem', fontWeight: 700, color: 'var(--success)' }}>
               ₹{(payouts?.total_received ?? 0).toLocaleString(locale)}
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 2 }}>{copy.totalReceived}</div>
@@ -313,8 +323,8 @@ export default function Home() {
 
         {/* ── Shield Pool ── */}
         {policy?.pool_id && (
-          <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--info-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'var(--bg-800)', border: '1.5px solid var(--border-dark)', borderRadius: 24, padding: 20 }}>
+            <div style={{ width: 46, height: 46, borderRadius: 14, background: 'var(--info-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Users size={22} style={{ color: 'var(--info)' }} />
             </div>
             <div style={{ flex: 1 }}>
@@ -330,17 +340,21 @@ export default function Home() {
         )}
 
         {/* ── Quick action ── */}
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 14, background: 'rgba(245,158,11,0.06)', borderColor: 'rgba(245,158,11,0.2)' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 14,
+          background: 'rgba(200,230,74,0.04)', border: '1.5px solid rgba(200,230,74,0.12)',
+          borderRadius: 24, padding: 20,
+        }}>
           <div style={{ fontSize: '1.5rem' }}>⚡</div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--amber)' }}>{copy.autoProtection}</div>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--lime)' }}>{copy.autoProtection}</div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{copy.autoProtectionDesc}</div>
           </div>
         </div>
 
         {/* ── Quick routes ── */}
-        <div className="card">
-          <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>
+        <div style={{ background: 'var(--bg-800)', border: '1.5px solid var(--border-dark)', borderRadius: 24, padding: 20 }}>
+          <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>
             {copy.quickRoutes}
           </div>
           <div className="quick-links-grid">
@@ -354,7 +368,7 @@ export default function Home() {
       </div>
 
       {error && (
-        <div style={{ margin: '12px 20px', padding: 14, borderRadius: 10, background: 'var(--danger-bg)', color: 'var(--danger)', fontSize: '0.82rem' }}>
+        <div style={{ margin: '12px 20px', padding: 14, borderRadius: 14, background: 'var(--danger-bg)', color: 'var(--danger)', fontSize: '0.82rem', border: '1px solid rgba(239,68,68,0.15)' }}>
           ⚠️ {error}
         </div>
       )}
@@ -379,10 +393,10 @@ function getGreeting(language) {
 function LoadingState() {
   return (
     <div className="page-container" style={{ padding: '52px 20px 0' }}>
-      <div style={{ height: 40, borderRadius: 8, marginBottom: 24 }} className="skeleton" />
-      <div style={{ height: 160, borderRadius: 24, marginBottom: 16 }} className="skeleton" />
-      <div style={{ height: 100, borderRadius: 20, marginBottom: 16 }} className="skeleton" />
-      <div style={{ height: 90, borderRadius: 20 }} className="skeleton" />
+      <div style={{ height: 40, borderRadius: 12, marginBottom: 24 }} className="skeleton" />
+      <div style={{ height: 180, borderRadius: 28, marginBottom: 14 }} className="skeleton" />
+      <div style={{ height: 110, borderRadius: 24, marginBottom: 14 }} className="skeleton" />
+      <div style={{ height: 90, borderRadius: 24 }} className="skeleton" />
       <BottomNav />
     </div>
   )

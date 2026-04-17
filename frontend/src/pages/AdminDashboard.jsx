@@ -141,24 +141,30 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-900)', maxWidth: '100%' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-900)', maxWidth: '100%', position: 'relative' }}>
+      <div className="noise-overlay" />
 
       {/* ── Top bar ────────────────────────────────────────────────── */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 200,
-        background: 'rgba(15,23,42,0.96)', backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid var(--border)',
-        padding: '0 24px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'rgba(17,29,4,0.94)', backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(200,230,74,0.08)',
+        padding: '0 28px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span style={{ fontSize: '1.3rem' }}>🛡️</span>
+          <div style={{
+            width: 34, height: 34, borderRadius: 10,
+            background: 'linear-gradient(135deg, var(--lime), var(--lime-light))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
+            boxShadow: '0 0 16px rgba(200,230,74,0.25)',
+          }}>🛡️</div>
           <div>
-            <span style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: '1rem', color: 'var(--amber)' }}>GIGASHIELD</span>
-            <span style={{ marginLeft: 8, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>ADMIN WAR ROOM</span>
+            <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '1rem', color: 'var(--lime)' }}>GIGASHIELD</span>
+            <span style={{ marginLeft: 8, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>ADMIN WAR ROOM</span>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.72rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.72rem', padding: '5px 12px', borderRadius: 99, background: wsConnected ? 'rgba(74,222,128,0.08)' : 'rgba(239,68,68,0.08)', border: `1px solid ${wsConnected ? 'rgba(74,222,128,0.15)' : 'rgba(239,68,68,0.15)'}` }}>
             {wsConnected
               ? <><Wifi size={13} style={{ color: 'var(--success)' }} /><span style={{ color: 'var(--success)' }}>Live</span></>
               : <><WifiOff size={13} style={{ color: 'var(--danger)' }} /><span style={{ color: 'var(--danger)' }}>Offline</span></>
@@ -168,31 +174,31 @@ export default function AdminDashboard() {
             Updated {lastRefresh.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
           </div>
           <button onClick={() => { setLoading(true); loadStats() }}
-            style={{ color: 'var(--text-muted)', display: 'flex' }}>
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            style={{ color: 'var(--text-muted)', display: 'flex', padding: 6, borderRadius: 8, background: 'var(--bg-700)', border: '1px solid var(--border-dark)' }}>
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={() => {
               sessionStorage.removeItem('gs_admin_token')
               navigate('/admin/login', { replace: true })
             }}
-            style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: 'var(--text-muted)' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: 'var(--text-muted)', padding: '6px 12px', borderRadius: 99, border: '1px solid var(--border-dark)', background: 'var(--bg-700)' }}
           >
-            <LogOut size={14} /> Logout
+            <LogOut size={13} /> Logout
           </button>
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            <ExternalLink size={14} /> Worker App
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '0.8rem', color: 'var(--text-muted)', padding: '6px 12px', borderRadius: 99, border: '1px solid var(--border-dark)', background: 'var(--bg-700)' }}>
+            <ExternalLink size={13} /> Worker App
           </Link>
         </div>
       </div>
 
-      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 24, position: 'relative', zIndex: 1 }}>
 
         {/* ── KPI row ─────────────────────────────────────────────── */}
         <KPICards stats={stats ?? {}} loading={loading} />
 
         {loadError && (
-          <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#FCA5A5', fontSize: '0.82rem' }}>
+          <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', color: '#FCA5A5', fontSize: '0.82rem' }}>
             ⚠️ {loadError}
           </div>
         )}
@@ -201,10 +207,10 @@ export default function AdminDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 20, height: 520 }}>
 
           {/* DSI Heatmap */}
-          <div style={{ background: 'var(--bg-800)', border: '1px solid var(--border)', borderRadius: 20, overflow: 'hidden', height: '100%' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>DSI Heatmap — 25 Zones Live</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', borderRadius: 24, overflow: 'hidden', height: '100%' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(200,230,74,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>DSI Heatmap — 25 Zones Live</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 99, background: 'rgba(74,222,128,0.08)' }}>
                 <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', animation: 'pulse 2s infinite' }} />
                 <span style={{ fontSize: '0.68rem', color: 'var(--success)' }}>Auto-refresh 60s</span>
               </div>
@@ -215,10 +221,12 @@ export default function AdminDashboard() {
           </div>
 
           {/* Demo Control Panel */}
-          <div className="card" style={{ borderRadius: 20, height: '100%', overflowY: 'auto',
-            background: 'linear-gradient(135deg, rgba(239,68,68,0.05), rgba(30,41,59,1))',
-            borderColor: 'rgba(239,68,68,0.2)' }}>
-            <div style={{ fontFamily: 'Poppins', fontWeight: 800, fontSize: '0.95rem', color: 'var(--danger)', marginBottom: 4 }}>
+          <div style={{
+            borderRadius: 24, height: '100%', overflowY: 'auto',
+            background: 'linear-gradient(135deg, rgba(239,68,68,0.04), var(--bg-800))',
+            border: '1.5px solid rgba(239,68,68,0.12)', padding: 20,
+          }}>
+            <div style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '0.95rem', color: 'var(--danger)', marginBottom: 4 }}>
               🎛 Demo Control Panel
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 20 }}>
@@ -232,8 +240,11 @@ export default function AdminDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 320px', gap: 20, minHeight: 460 }}>
 
           {/* XAI Panel */}
-          <div className="card" style={{ borderRadius: 20, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: '0.9rem', color: 'var(--amber)', marginBottom: 16 }}>
+          <div style={{
+            borderRadius: 24, display: 'flex', flexDirection: 'column',
+            background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', padding: 20,
+          }}>
+            <div style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '0.9rem', color: 'var(--lime)', marginBottom: 16 }}>
               🧠 Shield-SAC XAI
             </div>
             <div style={{ flex: 1 }}>
@@ -242,25 +253,31 @@ export default function AdminDashboard() {
           </div>
 
           {/* Fraud Monitor */}
-          <div className="card" style={{ borderRadius: 20, display: 'flex', flexDirection: 'column' }}>
+          <div style={{
+            borderRadius: 24, display: 'flex', flexDirection: 'column',
+            background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', padding: 20,
+          }}>
             <FraudMonitor liveEvents={liveEvents} />
           </div>
 
           {/* Trigger Timeline */}
-          <div className="card" style={{ borderRadius: 20, display: 'flex', flexDirection: 'column' }}>
+          <div style={{
+            borderRadius: 24, display: 'flex', flexDirection: 'column',
+            background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', padding: 20,
+          }}>
             <TriggerTimeline liveEvents={liveEvents} />
           </div>
         </div>
 
         {/* ── Live event log (collapsible) ──────────────────────── */}
         {liveEvents.length > 0 && (
-          <details style={{ background: 'var(--bg-800)', border: '1px solid var(--border)', borderRadius: 16, padding: '12px 18px' }}>
-            <summary style={{ cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+          <details style={{ background: 'var(--bg-800)', border: '1.5px solid rgba(200,230,74,0.08)', borderRadius: 20, padding: '14px 20px' }}>
+            <summary style={{ cursor: 'pointer', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               WebSocket Event Log ({liveEvents.length})
             </summary>
             <div style={{ marginTop: 12, fontFamily: 'monospace', fontSize: '0.7rem', color: 'var(--text-secondary)', maxHeight: 200, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
               {liveEvents.slice(0, 20).map((e, i) => (
-                <div key={i} style={{ padding: '4px 8px', borderRadius: 6, background: 'var(--bg-700)' }}>
+                <div key={i} style={{ padding: '5px 10px', borderRadius: 8, background: 'var(--bg-700)', border: '1px solid var(--border-dark)' }}>
                   [{new Date().toLocaleTimeString()}] {e.type} — {JSON.stringify(e.payload ?? {}).slice(0, 80)}…
                 </div>
               ))}
