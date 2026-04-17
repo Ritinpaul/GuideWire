@@ -280,7 +280,7 @@ workers ──► policies ──► claims ──► payouts
 
 ## 🏆 Key Accomplishments
 
-- ⚡ **73-second** WhatsApp onboarding — zero app downloads, zero forms
+- ⚡ **73-second** Telegram onboarding — zero app downloads, zero forms
 - 🕐 **< 3 minute** end-to-end claim pipeline — trigger detection to UPI credit
 - 🛡️ **Mathematical fairness** — premium cap enforced in the optimization space, not as a business rule
 - 🔬 **Novel IMU fraud detection** — accelerometer + gyroscope verify physical presence (unforgeable)
